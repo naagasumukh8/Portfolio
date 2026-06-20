@@ -19,19 +19,39 @@ import { GlobalPolish } from "../components/GlobalPolish";
 
 function NotFoundComponent() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="max-w-md text-center">
-        <h1 className="text-7xl font-bold text-foreground">404</h1>
-        <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          The page you're looking for doesn't exist or has been moved.
+    <div className="relative flex min-h-screen items-center justify-center bg-[#07121F] px-4 overflow-hidden">
+      {/* Background radial gradient glow */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div 
+          className="absolute -inset-[20%] opacity-40 blur-3xl"
+          style={{
+            background: "radial-gradient(50% 50% at 50% 50%, rgba(124,110,255,0.22), transparent 70%)",
+          }}
+        />
+      </div>
+      
+      {/* Noise Overlay */}
+      <div className="pointer-events-none absolute inset-0 opacity-[0.03] mix-blend-overlay bg-repeat"
+        style={{
+          backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")"
+        }}
+      />
+
+      <div className="relative z-10 w-full max-w-lg rounded-3xl border border-white/10 bg-white/[0.03] p-8 md:p-12 text-center backdrop-blur-md shadow-2xl">
+        <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-2xl mb-6 text-[#5CBDB9]">
+          ⚠️
+        </div>
+        <h1 className="font-display text-8xl font-bold tracking-tight text-white mb-2">404</h1>
+        <h2 className="font-display text-2xl font-bold text-white mb-4">Transmission Lost</h2>
+        <p className="font-sans text-sm text-[#8a8a8a] max-w-sm mx-auto mb-8 leading-relaxed">
+          The requested route was not recognized or is temporarily unavailable in this sector.
         </p>
-        <div className="mt-6">
+        <div className="flex justify-center">
           <Link
             to="/"
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="glass-pill text-xs font-semibold px-6 py-3 inline-flex items-center justify-center gap-2"
           >
-            Go home
+            Return to Core <span className="text-[#5CBDB9]">→</span>
           </Link>
         </div>
       </div>
@@ -108,8 +128,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       {
         property: "og:image",
-        content:
-          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/0472c6c7-4823-4142-8663-652cb105d3ca/id-preview-543c58b3--4d500def-4b48-43bc-a483-7f48c528ac6c.lovable.app-1781714374668.png",
+        content: "https://naagasumukh.engineer/og-image.png",
       },
       { property: "og:image:width", content: "1200" },
       { property: "og:image:height", content: "630" },
@@ -130,8 +149,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       {
         name: "twitter:image",
-        content:
-          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/0472c6c7-4823-4142-8663-652cb105d3ca/id-preview-543c58b3--4d500def-4b48-43bc-a483-7f48c528ac6c.lovable.app-1781714374668.png",
+        content: "https://naagasumukh.engineer/og-image.png",
       },
       { name: "twitter:image:alt", content: "Naaga Sumukh B S — AI/ML Engineer Portfolio" },
     ],
@@ -162,7 +180,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           telephone: "+91-99723-71999",
           image: {
             "@type": "ImageObject",
-            url: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/0472c6c7-4823-4142-8663-652cb105d3ca/id-preview-543c58b3--4d500def-4b48-43bc-a483-7f48c528ac6c.lovable.app-1781714374668.png",
+            url: "https://naagasumukh.engineer/og-image.png",
             width: 1200,
             height: 630,
           },

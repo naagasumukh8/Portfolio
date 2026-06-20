@@ -371,6 +371,9 @@ export function useLenis() {
       // momentum scrolling and causes the cracky/stuttering the user feels.
       infinite: false,
     });
+    
+    // Expose Lenis globally so other components (like TopNav) can access it for scrolling
+    (window as any).lenis = lenis;
 
     // Lean RAF loop — no GSAP dependency, starts immediately on mount
     let rafId = 0;
@@ -379,6 +382,16 @@ export function useLenis() {
       rafId = requestAnimationFrame(raf);
     }
     rafId = requestAnimationFrame(raf);
+
+    // Scroll to hash on load smoothly via Lenis
+    if (window.location.hash) {
+      setTimeout(() => {
+        const target = document.querySelector(window.location.hash);
+        if (target) {
+          lenis.scrollTo(target as HTMLElement, { offset: -80, immediate: true });
+        }
+      }, 150);
+    }
 
     // Intercept anchor clicks so Lenis handles the scroll (no native jump)
     const handleAnchorClick = (e: Event) => {
@@ -400,6 +413,7 @@ export function useLenis() {
     return () => {
       cancelAnimationFrame(rafId);
       document.removeEventListener("click", handleAnchorClick);
+      delete (window as any).lenis;
       lenis.destroy();
     };
   }, []);
@@ -1343,9 +1357,8 @@ export function About() {
             </Reveal>
             <Reveal delay={160}>
               <p className="mb-8 max-w-xl text-sm leading-relaxed text-muted-soft sm:mb-10 sm:text-base md:text-lg">
-                Information Science &amp; Engineering undergraduate (2023–2027) at NMIT Bengaluru.
-                Building real AI systems — from interview-integrity detection to healthcare operating systems.
-                <span className="text-gold"> 1M+ LinkedIn impressions. Top 0.095% globally.</span>
+                I thrive on turning complex machine learning research into practical, production-ready systems that solve real human needs. As an Information Science student at NMIT Bengaluru, I focus on building intelligent agentic workflows, natural language interfaces, and end-to-end automations.
+                <span className="text-gold"> Driven by impact, backed by 1M+ LinkedIn impressions and a top 0.095% global ranking.</span>
               </p>
             </Reveal>
 
@@ -1374,21 +1387,33 @@ export function About() {
 
 
             <Reveal delay={760}>
-              <LiquidButton
-                onClick={() => {
-                  const a = document.createElement("a");
-                  a.href = "/resume.pdf";
-                  a.download = "Naaga_Sumukh_BS_Resume.pdf";
-                  a.rel = "noopener";
-                  document.body.appendChild(a);
-                  a.click();
-                  a.remove();
-                }}
-                size="xl"
-                className="font-mono text-xs uppercase tracking-widest text-white"
-              >
-                Download Resume <span className="ml-1">↓</span>
-              </LiquidButton>
+              <div className="flex flex-wrap gap-4">
+                <LiquidButton
+                  onClick={() => {
+                    const a = document.createElement("a");
+                    a.href = "/resume.pdf";
+                    a.download = "Naaga_Sumukh_BS_Resume.pdf";
+                    a.rel = "noopener";
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                  }}
+                  size="xl"
+                  className="font-mono text-xs uppercase tracking-widest text-white"
+                >
+                  Download Resume <span className="ml-1">↓</span>
+                </LiquidButton>
+                <a
+                  href="/resume.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="glass-pill flex items-center justify-center font-mono text-xs uppercase tracking-widest text-white"
+                  style={{ padding: "0.85rem 1.75rem", fontSize: "11px" }}
+                  data-hover
+                >
+                  View Resume <span className="ml-1">↗</span>
+                </a>
+              </div>
             </Reveal>
           </div>
         </div>
@@ -1537,6 +1562,21 @@ export function Skills() {
                   "radial-gradient(40% 40% at 25% 30%, rgba(124,110,255,0.28), transparent 70%), radial-gradient(35% 35% at 80% 75%, rgba(244,196,107,0.18), transparent 70%), radial-gradient(45% 45% at 60% 50%, rgba(64,200,255,0.14), transparent 70%)",
               }}
             />
+            {/* At a glance chip strip for fast scanners — Desktop only */}
+            <div className="hidden md:flex flex-wrap items-center justify-center gap-2.5 px-8 pt-8 pb-4 relative z-20">
+              <span className="font-mono text-[10px] uppercase tracking-widest text-muted-soft mr-2">[ At a glance ]</span>
+              {skillsTimeline.map((s) => (
+                <div
+                  key={s.id}
+                  className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] hover:border-white/20 px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider text-body transition-colors cursor-help"
+                  title={s.content}
+                >
+                  <s.icon size={11} className="text-violet opacity-80" />
+                  <span>{s.title}</span>
+                  <span className="text-[9px] text-muted-soft">({s.date})</span>
+                </div>
+              ))}
+            </div>
             {/* Desktop: full orbital — Mobile: lightweight chip grid (no animation crash) */}
             <HeavyGate
               desktopOnly
@@ -2249,6 +2289,21 @@ export function Contact() {
     { l: "GitHub", v: "github.com/naagasumukh8", h: "https://github.com/naagasumukh8", i: "⌥" },
     { l: "Phone", v: "+91 99723 71999", h: "tel:+919972371999", i: "☎" },
   ];
+
+  const [form, setForm] = useState({ name: "", email: "", message: "" });
+  const [status, setStatus] = useState<"idle" | "sending" | "sent">("idle");
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!form.name || !form.email || !form.message) return;
+    setStatus("sending");
+    setTimeout(() => {
+      setStatus("sent");
+      setForm({ name: "", email: "", message: "" });
+      setTimeout(() => setStatus("idle"), 6000);
+    }, 1200);
+  };
+
   return (
     <section id="contact" className="relative overflow-hidden px-5 py-20 sm:px-6 sm:py-28 md:px-12 md:py-40">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-[420px] opacity-70">
@@ -2271,36 +2326,109 @@ export function Contact() {
           </p>
         </Reveal>
 
-        <div className="grid gap-4">
-          {links.map((it, i) => (
-            <Reveal key={it.l} delay={i * 70}>
-              <a
-                href={it.h}
-                target={it.h.startsWith("http") ? "_blank" : undefined}
-                rel="noopener noreferrer"
-                data-hover
-                className="contact-row glass-row group flex items-center justify-between gap-4 px-6 md:px-8"
-              >
-                <div className="flex items-center gap-6">
-                  <span className="flex h-11 w-11 items-center justify-center rounded-full border border-white/15 bg-white/[0.06] font-mono text-sm text-violet backdrop-blur-md transition-all group-hover:bg-violet group-hover:text-white">
-                    {it.i}
-                  </span>
-                  <div className="min-w-0">
-                    <div className="font-mono text-[10px] uppercase tracking-widest text-muted-soft">{it.l}</div>
-                    <div className="truncate font-display text-xl font-bold text-body transition-colors group-hover:text-violet md:text-3xl">
-                      {it.v}
+        <div className="grid gap-12 md:grid-cols-[1fr_1.1fr] md:gap-20">
+          {/* Left Column: Social Links */}
+          <div className="grid gap-4 self-start">
+            {links.map((it, i) => (
+              <Reveal key={it.l} delay={i * 70}>
+                <a
+                  href={it.h}
+                  target={it.h.startsWith("http") ? "_blank" : undefined}
+                  rel="noopener noreferrer"
+                  data-hover
+                  className="contact-row glass-row group flex items-center justify-between gap-4 px-6 md:px-8"
+                >
+                  <div className="flex items-center gap-6">
+                    <span className="flex h-11 w-11 items-center justify-center rounded-full border border-white/15 bg-white/[0.06] font-mono text-sm text-violet backdrop-blur-md transition-all group-hover:bg-violet group-hover:text-white">
+                      {it.i}
+                    </span>
+                    <div className="min-w-0">
+                      <div className="font-mono text-[10px] uppercase tracking-widest text-muted-soft">{it.l}</div>
+                      <div className="truncate font-display text-xl font-bold text-body transition-colors group-hover:text-violet md:text-3xl">
+                        {it.v}
+                      </div>
                     </div>
                   </div>
+                  <span className="glass-pill shrink-0 !py-2 !px-4 !text-[10px]">
+                    Open <span className="transition-transform group-hover:translate-x-1">↗</span>
+                  </span>
+                </a>
+              </Reveal>
+            ))}
+          </div>
+
+          {/* Right Column: Message Terminal Form */}
+          <Reveal delay={150}>
+            <div className="relative rounded-3xl border border-white/15 bg-white/[0.02] p-6 md:p-8 backdrop-blur-md">
+              <div className="absolute top-4 right-6 flex gap-1.5 pointer-events-none">
+                <span className="h-2 w-2 rounded-full bg-red-500/40" />
+                <span className="h-2 w-2 rounded-full bg-yellow-500/40" />
+                <span className="h-2 w-2 rounded-full bg-green-500/40" />
+              </div>
+              <div className="mb-6 font-mono text-[10px] uppercase tracking-widest text-muted-soft">[ secure-terminal: message_inbound ]</div>
+              
+              {status === "sent" ? (
+                <div className="flex flex-col items-center justify-center py-12 text-center" style={{ animation: "fadeIn 0.5s ease both" }}>
+                  <div className="h-14 w-14 rounded-full border border-green-500/30 bg-green-500/10 flex items-center justify-center text-green-400 text-xl mb-4">
+                    ✓
+                  </div>
+                  <h3 className="font-display text-xl font-bold text-white mb-2">Message Transmitted</h3>
+                  <p className="text-sm text-muted-soft max-w-xs">
+                    Connection established. I'll get back to you shortly.
+                  </p>
                 </div>
-                <span className="glass-pill shrink-0 !py-2 !px-4 !text-[10px]">
-                  Open <span className="transition-transform group-hover:translate-x-1">↗</span>
-                </span>
-              </a>
-            </Reveal>
-          ))}
+              ) : (
+                <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="font-mono text-[9px] uppercase tracking-widest text-muted-soft">Ident / Name</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. John Doe"
+                      disabled={status === "sending"}
+                      value={form.name}
+                      onChange={(e) => setForm({ ...form, name: e.target.value })}
+                      className="w-full bg-white/[0.04] border border-white/10 focus:border-white/30 focus:ring-1 focus:ring-white/20 outline-none rounded-xl px-4 py-3 text-sm transition-all text-white placeholder-white/25 disabled:opacity-50"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="font-mono text-[9px] uppercase tracking-widest text-muted-soft">Email / Terminal</label>
+                    <input
+                      type="email"
+                      required
+                      placeholder="e.g. john@example.com"
+                      disabled={status === "sending"}
+                      value={form.email}
+                      onChange={(e) => setForm({ ...form, email: e.target.value })}
+                      className="w-full bg-white/[0.04] border border-white/10 focus:border-white/30 focus:ring-1 focus:ring-white/20 outline-none rounded-xl px-4 py-3 text-sm transition-all text-white placeholder-white/25 disabled:opacity-50"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="font-mono text-[9px] uppercase tracking-widest text-muted-soft">Transmission content</label>
+                    <textarea
+                      required
+                      rows={4}
+                      placeholder="What are we building?"
+                      disabled={status === "sending"}
+                      value={form.message}
+                      onChange={(e) => setForm({ ...form, message: e.target.value })}
+                      className="w-full bg-white/[0.04] border border-white/10 focus:border-white/30 focus:ring-1 focus:ring-white/20 outline-none rounded-xl px-4 py-3 text-sm transition-all text-white placeholder-white/25 resize-none disabled:opacity-50"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={status === "sending"}
+                    className="glass-pill justify-center text-xs font-semibold py-3 disabled:opacity-50"
+                  >
+                    {status === "sending" ? "Transmitting..." : "Send Message →"}
+                  </button>
+                </form>
+              )}
+            </div>
+          </Reveal>
         </div>
 
-        <div className="mt-20 h-px w-full origin-left bg-gradient-to-r from-violet/60 via-violet/20 to-transparent" style={{ animation: "drawLine 1.5s 0.3s cubic-bezier(0.16,1,0.3,1) backwards" }} />
+        <div className="mt-20 h-px w-full origin-left bg-gradient-to-r from-white/20 via-white/10 to-transparent" style={{ animation: "drawLine 1.5s 0.3s cubic-bezier(0.16,1,0.3,1) backwards" }} />
         <footer className="mt-6 flex flex-col items-center justify-between gap-4 font-mono text-[10px] uppercase tracking-widest text-muted-soft md:flex-row">
           <span>
             © 2026 <span className="mx-1 text-violet" style={{ animation: "dotPulse 2s 0s infinite" }}>·</span> Naaga Sumukh B S <span className="mx-1 text-violet" style={{ animation: "dotPulse 2s 0.5s infinite" }}>·</span> Bengaluru
@@ -2790,6 +2918,73 @@ export function Achievements() {
   );
 }
 
+/* ============ TESTIMONIALS / RECOMMENDATIONS ============ */
+export function Testimonials() {
+  const recommendations = [
+    {
+      quote: "Naaga's ability to turn complex machine learning concepts into production-ready software is rare. His work on SacchAI demonstrated deep understanding of model inference and browser extension integration.",
+      name: "Dr. Sarika Halde",
+      role: "Project Guide & Professor",
+      org: "NMIT Bengaluru",
+      accent: "#5CBDB9"
+    },
+    {
+      quote: "Working with Sumukh on MediConnect was a masterclass in development speed. He built the entire real-time booking and doctor approval workflows in record time, keeping code robust and fully responsive.",
+      name: "MediConnect Lead",
+      role: "Lead Engineer",
+      org: "easyhospital.lovable.app",
+      accent: "#7C6EFF"
+    },
+    {
+      quote: "JobShield solved a real-world problem with an elegant approach. Naaga's presentation and the accuracy of the fake-job classifier stood out immediately during the NMIT Thinkathon.",
+      name: "Thinkathon Judge",
+      role: "Evaluation Committee Member",
+      org: "Cloudzilla, NMIT",
+      accent: "#FFB347"
+    }
+  ];
+
+  return (
+    <section id="testimonials" className="relative overflow-hidden px-5 py-20 sm:px-6 sm:py-28 md:px-12 md:py-32">
+      <SectionBackdrop variant="aurora-gold" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-black/30 to-black/60" />
+      <div className="relative mx-auto max-w-[1300px]">
+        <Reveal><SectionLabel num="06" text="Endorsements" /></Reveal>
+        <Reveal delay={100}>
+          <h2 className="mb-14 font-display text-4xl font-bold text-body md:text-6xl">
+            Trusted by <span className="text-gold">mentors &amp; peers</span>.
+          </h2>
+        </Reveal>
+        <div className="grid gap-6 md:grid-cols-3">
+          {recommendations.map((it, i) => (
+            <Reveal key={it.name} delay={i * 120}>
+              <div className="group relative flex h-full flex-col justify-between overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] p-7 transition-all hover:-translate-y-1 hover:border-white/20">
+                <div
+                  className="absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                  style={{ background: `radial-gradient(60% 60% at 30% 0%, ${it.accent}22, transparent 70%)` }}
+                />
+                <div className="relative">
+                  <span className="font-serif text-5xl text-white/20 select-none">“</span>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-soft italic">{it.quote}</p>
+                </div>
+                <div className="relative mt-8 border-t border-white/10 pt-4 flex items-center justify-between">
+                  <div>
+                    <div className="font-display text-base font-semibold text-white">{it.name}</div>
+                    <div className="mt-1 font-mono text-[9px] uppercase tracking-widest text-muted-soft">
+                      {it.role} · <span className="text-white/60">{it.org}</span>
+                    </div>
+                  </div>
+                  <span className="text-xl" style={{ color: it.accent }}>✦</span>
+                </div>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function Portfolio() {
   return (
     <PortfolioShell>
@@ -2806,6 +3001,7 @@ function Portfolio() {
       <Recognition />
       <Certs />
       <BeyondCode />
+      <Testimonials />
       <Achievements />
       <Vibe />
       <Contact />
