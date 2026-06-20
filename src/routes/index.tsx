@@ -367,7 +367,13 @@ export function useLenis() {
       const gsap = gsapMod.default;
       const ScrollTrigger = stMod.ScrollTrigger;
       gsap.registerPlugin(ScrollTrigger);
-      const instance = new Lenis({ lerp: 0.12, duration: 0.9, smoothWheel: true, wheelMultiplier: 1, touchMultiplier: 1.4 });
+      const instance = new Lenis({
+        lerp: 0.075,
+        duration: 1.4,
+        smoothWheel: true,
+        wheelMultiplier: 1,
+        touchMultiplier: 1,
+      });
       lenis = instance as unknown as typeof lenis;
       instance.on("scroll", ScrollTrigger.update);
       gsap.ticker.add((time) => instance.raf(time * 1000));
@@ -516,6 +522,7 @@ function Reveal({ children, delay = 0, className = "" }: { children: ReactNode; 
         opacity: vis ? 1 : 0,
         transform: vis ? "translateY(0)" : "translateY(40px)",
         transition: `opacity 0.9s cubic-bezier(0.16,1,0.3,1) ${delay}ms, transform 0.9s cubic-bezier(0.16,1,0.3,1) ${delay}ms`,
+        willChange: "transform, opacity",
       }}
     >
       {children}
@@ -1614,15 +1621,17 @@ export function Journey() {
     { yr: "2020", title: "Class X, CBSE", desc: "Score: 91.2%" },
   ];
   const ref = useRef<HTMLDivElement>(null);
-  const [progress, setProgress] = useState(0);
+  const progressLineRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const onScroll = () => {
       const el = ref.current; if (!el) return;
+      const line = progressLineRef.current; if (!line) return;
       const r = el.getBoundingClientRect();
       const vh = window.innerHeight;
       const total = r.height + vh;
       const passed = vh - r.top;
-      setProgress(Math.max(0, Math.min(1, passed / total)));
+      const pct = Math.max(0, Math.min(100, (passed / total) * 100));
+      line.style.height = `${pct}%`;
     };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -1643,9 +1652,10 @@ export function Journey() {
         <div ref={ref} className="relative pl-10 md:pl-16">
           <div className="absolute left-3 top-0 h-full w-px bg-white/5 md:left-6" />
           <div
+            ref={progressLineRef}
             className="absolute left-3 top-0 w-px md:left-6"
             style={{
-              height: `${progress * 100}%`,
+              height: "0%",
               background: "linear-gradient(180deg, #5CBDB9, #7DD3FC)",
               boxShadow: "0 0 12px #5CBDB9",
               transition: "height 0.1s linear",

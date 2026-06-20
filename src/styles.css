@@ -72,7 +72,7 @@
     border-color: var(--color-border);
   }
   html {
-    scroll-behavior: smooth;
+    scroll-behavior: auto !important;
     background: #000000;
     overflow-x: hidden;
   }
@@ -342,15 +342,4 @@
   }
 }
 
-/* ============ DESKTOP SCROLL PERFORMANCE ============
- * content-visibility:auto lets the browser skip layout/paint for off-screen
- * sections entirely — biggest single win for scroll smoothness on long pages.
- * contain-intrinsic-size gives the scrollbar a stable height before render.
- */
-@media (min-width: 768px) {
-  main > section,
-  section[id] {
-    content-visibility: auto;
-    contain-intrinsic-size: 1px 800px;
-  }
-}
+
