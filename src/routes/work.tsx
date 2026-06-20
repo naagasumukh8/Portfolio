@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PortfolioShell, Projects, Marquee, Live3D } from "./index";
+import { PortfolioShell } from "@/components/portfolio/PortfolioShell";
+import { Projects, Live3D } from "@/components/portfolio/Work";
+import { Marquee } from "@/components/portfolio/PortfolioUtils";
 
 export const Route = createFileRoute("/work")({
   head: () => ({

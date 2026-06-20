@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PortfolioShell, Vibe, Marquee } from "./index";
+import { PortfolioShell } from "@/components/portfolio/PortfolioShell";
+import { Vibe } from "@/components/portfolio/Vibe";
+import { Marquee } from "@/components/portfolio/PortfolioUtils";
 
 export const Route = createFileRoute("/vibe")({
   head: () => ({

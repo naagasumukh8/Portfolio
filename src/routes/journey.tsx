@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PortfolioShell, Journey, Marquee, Recognition, Certs } from "./index";
+import { PortfolioShell } from "@/components/portfolio/PortfolioShell";
+import { Journey, Recognition, Certs } from "@/components/portfolio/Journey";
+import { Marquee } from "@/components/portfolio/PortfolioUtils";
 
 export const Route = createFileRoute("/journey")({
   head: () => ({

@@ -1,21 +1,19 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-// hamburger icon is rendered inline as three animated bars
 import portrait from "../assets/portrait-avatar.jpg.asset.json";
 
 const links = [
-  { hash: "", label: "Home", id: "hero" },
-  { hash: "about", label: "About", id: "about" },
-  { hash: "work", label: "Work", id: "work" },
-  { hash: "journey", label: "Journey", id: "journey" },
-  { hash: "vibe", label: "Vibe", id: "vibe" },
-  { hash: "contact", label: "Contact", id: "contact" },
+  { to: "/", label: "Home" },
+  { to: "/about", label: "About" },
+  { to: "/work", label: "Work" },
+  { to: "/journey", label: "Journey" },
+  { to: "/vibe", label: "Vibe" },
+  { to: "/contact", label: "Contact" },
 ] as const;
 
 export function TopNav() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [active, setActive] = useState<string>("hero");
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 80);
@@ -23,28 +21,6 @@ export function TopNav() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const ids = links.map((l) => l.id);
-    const els = ids
-      .map((id) => document.getElementById(id))
-      .filter((el): el is HTMLElement => !!el);
-    if (!els.length) return;
-    const io = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((e) => e.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
-        if (visible[0]) setActive(visible[0].target.id);
-      },
-      { rootMargin: "-40% 0px -50% 0px", threshold: [0, 0.25, 0.5, 0.75, 1] },
-    );
-    els.forEach((el) => io.observe(el));
-    return () => io.disconnect();
-  }, []);
-
-  const isActive = (id: string) => active === id;
 
   return (
     <header
@@ -66,29 +42,24 @@ export function TopNav() {
 
         <ul className="hidden md:flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-2 py-1 backdrop-blur-md">
           {links.map((l) => {
-            const act = isActive(l.id);
             return (
               <li key={l.label}>
-                <a
-                  href={l.hash ? `/#${l.hash}` : "/"}
-                  onClick={(e) => smoothScrollOnSamePage(e, l.hash)}
-                  aria-current={act ? "page" : undefined}
-                  className={`relative inline-flex items-center rounded-full px-3 py-1.5 text-xs font-medium transition-all ${
-                    act
-                      ? "text-white shadow-[0_0_22px_rgba(124,110,255,0.65)] ring-1 ring-[rgba(167,139,250,0.7)]"
-                      : "text-foreground/70 hover:text-foreground hover:bg-white/10"
-                  }`}
-                  style={
-                    act
-                      ? {
-                          background:
-                            "linear-gradient(135deg, rgba(124,110,255,0.35), rgba(255,255,255,0.06))",
-                        }
-                      : undefined
-                  }
+                <Link
+                  to={l.to}
+                  activeOptions={{ exact: l.to === "/" }}
+                  className="relative inline-flex items-center rounded-full px-3 py-1.5 text-xs font-medium transition-all"
+                  activeProps={{
+                    className: "text-white shadow-[0_0_22px_rgba(124,110,255,0.65)] ring-1 ring-[rgba(167,139,250,0.7)]",
+                    style: {
+                      background: "linear-gradient(135deg, rgba(124,110,255,0.35), rgba(255,255,255,0.06))",
+                    }
+                  }}
+                  inactiveProps={{
+                    className: "text-foreground/70 hover:text-foreground hover:bg-white/10"
+                  }}
                 >
                   {l.label}
-                </a>
+                </Link>
               </li>
             );
           })}
@@ -135,7 +106,6 @@ export function TopNav() {
       >
         <ul className="mx-4 mt-4 flex flex-col gap-1 rounded-2xl border border-white/10 bg-white/[0.03] p-2">
           {links.map((l, idx) => {
-            const act = isActive(l.id);
             return (
               <li
                 key={l.label}
@@ -145,21 +115,20 @@ export function TopNav() {
                   transition: `transform 480ms cubic-bezier(0.16,1,0.3,1) ${open ? 120 + idx * 70 : 0}ms, opacity 320ms ease ${open ? 120 + idx * 70 : 0}ms`,
                 }}
               >
-                <a
-                  href={l.hash ? `/#${l.hash}` : "/"}
-                  onClick={(e) => {
-                    setOpen(false);
-                    smoothScrollOnSamePage(e, l.hash);
+                <Link
+                  to={l.to}
+                  activeOptions={{ exact: l.to === "/" }}
+                  onClick={() => setOpen(false)}
+                  className="block rounded-xl px-4 py-3 text-base font-medium transition-colors active:scale-[0.96]"
+                  activeProps={{
+                    className: "text-white bg-[linear-gradient(135deg,rgba(124,110,255,0.35),rgba(255,255,255,0.06))] shadow-[0_0_22px_rgba(124,110,255,0.55)] ring-1 ring-[rgba(167,139,250,0.7)]"
                   }}
-                  aria-current={act ? "page" : undefined}
-                  className={`block rounded-xl px-4 py-3 text-base font-medium transition-colors active:scale-[0.96] ${
-                    act
-                      ? "text-white bg-[linear-gradient(135deg,rgba(124,110,255,0.35),rgba(255,255,255,0.06))] shadow-[0_0_22px_rgba(124,110,255,0.55)] ring-1 ring-[rgba(167,139,250,0.7)]"
-                      : "text-foreground/85 hover:bg-white/10"
-                  }`}
+                  inactiveProps={{
+                    className: "text-foreground/85 hover:bg-white/10"
+                  }}
                 >
                   {l.label}
-                </a>
+                </Link>
               </li>
             );
           })}
@@ -168,24 +137,3 @@ export function TopNav() {
     </header>
   );
 }
-
-function smoothScrollOnSamePage(e: React.MouseEvent, hash: string) {
-  if (typeof window === "undefined") return;
-  if (window.location.pathname !== "/") return;
-  e.preventDefault();
-  if (!hash) {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-    history.replaceState(null, "", "/");
-    return;
-  }
-  const el = document.getElementById(hash);
-  if (el) {
-    const yOffset = -80;
-    const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
-    window.scrollTo({ top: y, behavior: "smooth" });
-    history.replaceState(null, "", `/#${hash}`);
-  }
-}
-
-void Link;
-void useRouterState;
