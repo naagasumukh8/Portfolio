@@ -70,15 +70,12 @@ export function DesktopRecommendation() {
                 <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl border border-white/15 bg-white/5">
                   <Monitor className="h-6 w-6 text-[#7c6eff]" />
                 </div>
-                <h2 className="text-lg font-semibold leading-tight text-white">
-                  Best on desktop
-                </h2>
+                <h2 className="text-lg font-semibold leading-tight text-white">Best on desktop</h2>
               </div>
 
               <p className="text-sm leading-relaxed text-white/70">
-                This portfolio is crafted with 3D orbits, shader backdrops and
-                rich motion. For the full cinematic experience, open it on a
-                laptop or larger screen.
+                This portfolio is crafted with 3D orbits, shader backdrops and rich motion. For the
+                full cinematic experience, open it on a laptop or larger screen.
               </p>
 
               <div className="mt-5 flex flex-col gap-2">

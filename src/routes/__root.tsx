@@ -22,18 +22,21 @@ function NotFoundComponent() {
     <div className="relative flex min-h-screen items-center justify-center bg-[#07121F] px-4 overflow-hidden">
       {/* Background radial gradient glow */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div 
+        <div
           className="absolute -inset-[20%] opacity-40 blur-3xl"
           style={{
-            background: "radial-gradient(50% 50% at 50% 50%, rgba(124,110,255,0.22), transparent 70%)",
+            background:
+              "radial-gradient(50% 50% at 50% 50%, rgba(124,110,255,0.22), transparent 70%)",
           }}
         />
       </div>
-      
+
       {/* Noise Overlay */}
-      <div className="pointer-events-none absolute inset-0 opacity-[0.03] mix-blend-overlay bg-repeat"
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.03] mix-blend-overlay bg-repeat"
         style={{
-          backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")"
+          backgroundImage:
+            "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
         }}
       />
 
@@ -110,8 +113,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "Naaga Sumukh B S — AI/ML engineer from Bengaluru, India. NMIT B.E. Information Science student building intelligent systems: machine learning, NLP, generative AI, automation. Creator of SacchAI, MediConnect & JobShield. Top 0.095% global LinkedIn rank (Cleve AI 2024). Contact: naagasumukh1@gmail.com.",
       },
       { name: "author", content: "Naaga Sumukh B S" },
-      { name: "keywords", content: "Naaga Sumukh, Naaga Sumukh B S, naagasumukh, AI ML engineer Bengaluru, NMIT AI engineer, SacchAI, MediConnect, JobShield, machine learning portfolio, NLP engineer India, generative AI developer" },
-      { name: "robots", content: "index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" },
+      {
+        name: "keywords",
+        content:
+          "Naaga Sumukh, Naaga Sumukh B S, naagasumukh, AI ML engineer Bengaluru, NMIT AI engineer, SacchAI, MediConnect, JobShield, machine learning portfolio, NLP engineer India, generative AI developer",
+      },
+      {
+        name: "robots",
+        content: "index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1",
+      },
       { name: "googlebot", content: "index, follow" },
       { name: "theme-color", content: "#07121F" },
       { name: "application-name", content: "Naaga Sumukh — Portfolio" },
@@ -141,7 +151,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@naagasumukh" },
       { name: "twitter:creator", content: "@naagasumukh" },
-      { name: "twitter:title", content: "Naaga Sumukh B S | AI/ML Engineer | naagasumukh.engineer" },
+      {
+        name: "twitter:title",
+        content: "Naaga Sumukh B S | AI/ML Engineer | naagasumukh.engineer",
+      },
       {
         name: "twitter:description",
         content:
@@ -158,7 +171,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "stylesheet", href: appCss },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Black&family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Black&family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap",
+      },
     ],
     scripts: [
       // ── Person schema — the primary signal Google uses for name queries ────
@@ -202,14 +218,38 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
             },
           },
           hasCredential: [
-            { "@type": "EducationalOccupationalCredential", name: "ML Specialization", credentialCategory: "Certificate", recognizedBy: { "@type": "Organization", name: "Stanford University / Coursera" } },
-            { "@type": "EducationalOccupationalCredential", name: "Generative AI Track", credentialCategory: "Credential", recognizedBy: { "@type": "Organization", name: "Credly" } },
+            {
+              "@type": "EducationalOccupationalCredential",
+              name: "ML Specialization",
+              credentialCategory: "Certificate",
+              recognizedBy: { "@type": "Organization", name: "Stanford University / Coursera" },
+            },
+            {
+              "@type": "EducationalOccupationalCredential",
+              name: "Generative AI Track",
+              credentialCategory: "Credential",
+              recognizedBy: { "@type": "Organization", name: "Credly" },
+            },
           ],
           knowsAbout: [
-            "Artificial Intelligence", "Machine Learning", "Natural Language Processing",
-            "Generative AI", "Large Language Models", "Python", "Scikit-learn",
-            "Pandas", "NumPy", "TF-IDF", "Random Forest", "N8N", "Power BI",
-            "Workflow Automation", "Supabase", "React", "TypeScript", "SQL",
+            "Artificial Intelligence",
+            "Machine Learning",
+            "Natural Language Processing",
+            "Generative AI",
+            "Large Language Models",
+            "Python",
+            "Scikit-learn",
+            "Pandas",
+            "NumPy",
+            "TF-IDF",
+            "Random Forest",
+            "N8N",
+            "Power BI",
+            "Workflow Automation",
+            "Supabase",
+            "React",
+            "TypeScript",
+            "SQL",
           ],
           award: [
             "Top 0.095% Global LinkedIn Rank — Cleve AI LinkedIn Wrapped 2024",
@@ -233,13 +273,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           name: "Naaga Sumukh B S — AI/ML Engineer Portfolio",
           alternateName: "naagasumukh.engineer",
           url: "https://naagasumukh.engineer",
-          description: "Personal portfolio of Naaga Sumukh B S, AI/ML engineer from Bengaluru, India.",
+          description:
+            "Personal portfolio of Naaga Sumukh B S, AI/ML engineer from Bengaluru, India.",
           author: { "@type": "Person", "@id": "https://naagasumukh.engineer/#person" },
           inLanguage: "en-IN",
           copyrightYear: 2025,
           potentialAction: {
             "@type": "SearchAction",
-            target: { "@type": "EntryPoint", urlTemplate: "https://naagasumukh.engineer/?q={search_term_string}" },
+            target: {
+              "@type": "EntryPoint",
+              urlTemplate: "https://naagasumukh.engineer/?q={search_term_string}",
+            },
             "query-input": "required name=search_term_string",
           },
         }),
@@ -253,7 +297,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "@id": "https://naagasumukh.engineer/#webpage",
           url: "https://naagasumukh.engineer",
           name: "Naaga Sumukh B S | AI/ML Engineer | Bengaluru",
-          description: "Portfolio of Naaga Sumukh B S — AI/ML engineer, NMIT Bengaluru. Projects: SacchAI, MediConnect, JobShield. Skills: ML, NLP, Python, GenAI.",
+          description:
+            "Portfolio of Naaga Sumukh B S — AI/ML engineer, NMIT Bengaluru. Projects: SacchAI, MediConnect, JobShield. Skills: ML, NLP, Python, GenAI.",
           isPartOf: { "@type": "WebSite", "@id": "https://naagasumukh.engineer/#website" },
           about: { "@type": "Person", "@id": "https://naagasumukh.engineer/#person" },
           datePublished: "2025-01-01",
@@ -261,7 +306,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           inLanguage: "en-IN",
           breadcrumb: {
             "@type": "BreadcrumbList",
-            itemListElement: [{ "@type": "ListItem", position: 1, name: "Home", item: "https://naagasumukh.engineer" }],
+            itemListElement: [
+              {
+                "@type": "ListItem",
+                position: 1,
+                name: "Home",
+                item: "https://naagasumukh.engineer",
+              },
+            ],
           },
         }),
       },

@@ -8,12 +8,7 @@ type Props = {
   speed?: number;
 };
 
-export function GLSLHills({
-  className = "",
-  cameraZ = 125,
-  planeSize = 256,
-  speed = 0.5,
-}: Props) {
+export function GLSLHills({ className = "", cameraZ = 125, planeSize = 256, speed = 0.5 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -131,16 +126,19 @@ export function GLSLHills({
       raf = requestAnimationFrame(loop);
     };
 
-    const observer = new IntersectionObserver(([entry]) => {
-      const wasIntersecting = isIntersecting;
-      isIntersecting = entry.isIntersecting;
-      if (isIntersecting && !wasIntersecting) {
-        cancelAnimationFrame(raf);
-        raf = requestAnimationFrame(loop);
-      } else if (!isIntersecting) {
-        cancelAnimationFrame(raf);
-      }
-    }, { threshold: 0 });
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        const wasIntersecting = isIntersecting;
+        isIntersecting = entry.isIntersecting;
+        if (isIntersecting && !wasIntersecting) {
+          cancelAnimationFrame(raf);
+          raf = requestAnimationFrame(loop);
+        } else if (!isIntersecting) {
+          cancelAnimationFrame(raf);
+        }
+      },
+      { threshold: 0 },
+    );
     observer.observe(canvas);
 
     return () => {

@@ -5,9 +5,16 @@ export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
       { title: "About — Naaga Sumukh B S" },
-      { name: "description", content: "About Naaga Sumukh B S — AI/ML engineer, NMIT Bengaluru. Skills, story, and how I work." },
+      {
+        name: "description",
+        content:
+          "About Naaga Sumukh B S — AI/ML engineer, NMIT Bengaluru. Skills, story, and how I work.",
+      },
       { property: "og:title", content: "About — Naaga Sumukh B S" },
-      { property: "og:description", content: "About me, my skills and how I build intelligent systems." },
+      {
+        property: "og:description",
+        content: "About me, my skills and how I build intelligent systems.",
+      },
       { property: "og:url", content: "https://naagasumukh.engineer/about" },
     ],
     links: [{ rel: "canonical", href: "https://naagasumukh.engineer/about" }],

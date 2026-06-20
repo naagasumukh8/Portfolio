@@ -5,7 +5,10 @@ export const Route = createFileRoute("/vibe")({
   head: () => ({
     meta: [
       { title: "Vibe — Naaga Sumukh B S" },
-      { name: "description", content: "An interactive playground of shaders, image trails and motion." },
+      {
+        name: "description",
+        content: "An interactive playground of shaders, image trails and motion.",
+      },
       { property: "og:title", content: "Vibe — Naaga Sumukh B S" },
       { property: "og:description", content: "Shaders, image trails and motion experiments." },
       { property: "og:url", content: "https://naagasumukh.engineer/vibe" },

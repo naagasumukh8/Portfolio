@@ -11,8 +11,7 @@ interface Circle {
   fadeState: "in" | "out" | null;
 }
 
-export interface HoverButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export interface HoverButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
 }
 
@@ -59,14 +58,10 @@ const HoverButton = React.forwardRef<HTMLButtonElement, HoverButtonProps>(
         if (c.fadeState !== null) return;
         timers.push(
           window.setTimeout(() => {
-            setCircles((prev) =>
-              prev.map((p) => (p.id === c.id ? { ...p, fadeState: "in" } : p)),
-            );
+            setCircles((prev) => prev.map((p) => (p.id === c.id ? { ...p, fadeState: "in" } : p)));
           }, 0),
           window.setTimeout(() => {
-            setCircles((prev) =>
-              prev.map((p) => (p.id === c.id ? { ...p, fadeState: "out" } : p)),
-            );
+            setCircles((prev) => prev.map((p) => (p.id === c.id ? { ...p, fadeState: "out" } : p)));
           }, 900),
           window.setTimeout(() => {
             setCircles((prev) => prev.filter((p) => p.id !== c.id));

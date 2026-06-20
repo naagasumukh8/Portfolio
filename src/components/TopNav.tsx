@@ -38,7 +38,7 @@ export function TopNav() {
           .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
         if (visible[0]) setActive(visible[0].target.id);
       },
-      { rootMargin: "-40% 0px -50% 0px", threshold: [0, 0.25, 0.5, 0.75, 1] }
+      { rootMargin: "-40% 0px -50% 0px", threshold: [0, 0.25, 0.5, 0.75, 1] },
     );
     els.forEach((el) => io.observe(el));
     return () => io.disconnect();
@@ -103,7 +103,9 @@ export function TopNav() {
           <span className="relative block h-3.5 w-5">
             <span
               className="absolute left-0 top-0 h-[2px] w-full rounded-full bg-current transition-transform duration-300"
-              style={{ transform: open ? "translateY(6px) rotate(45deg)" : "translateY(0) rotate(0)" }}
+              style={{
+                transform: open ? "translateY(6px) rotate(45deg)" : "translateY(0) rotate(0)",
+              }}
             />
             <span
               className="absolute left-0 top-[6px] h-[2px] w-full rounded-full bg-current transition-opacity duration-200"
@@ -111,7 +113,9 @@ export function TopNav() {
             />
             <span
               className="absolute left-0 top-[12px] h-[2px] w-full rounded-full bg-current transition-transform duration-300"
-              style={{ transform: open ? "translateY(-6px) rotate(-45deg)" : "translateY(0) rotate(0)" }}
+              style={{
+                transform: open ? "translateY(-6px) rotate(-45deg)" : "translateY(0) rotate(0)",
+              }}
             />
           </span>
         </button>
@@ -125,8 +129,7 @@ export function TopNav() {
           clipPath: open
             ? "circle(160% at calc(100% - 28px) 0%)"
             : "circle(0% at calc(100% - 28px) 0%)",
-          background:
-            "linear-gradient(180deg, rgba(7,18,31,0.96) 0%, rgba(7,18,31,0.92) 100%)",
+          background: "linear-gradient(180deg, rgba(7,18,31,0.96) 0%, rgba(7,18,31,0.92) 100%)",
           backdropFilter: "blur(20px) saturate(140%)",
         }}
       >

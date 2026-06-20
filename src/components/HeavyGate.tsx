@@ -22,9 +22,11 @@ export function useLowEndDevice() {
       connection?: { effectiveType?: string; saveData?: boolean };
     };
     const isSmallScreen = window.matchMedia("(max-width: 767px)").matches;
-    const lowCPU = typeof navigator.hardwareConcurrency === "number" && navigator.hardwareConcurrency <= 4;
+    const lowCPU =
+      typeof navigator.hardwareConcurrency === "number" && navigator.hardwareConcurrency <= 4;
     const lowRAM = typeof nav.deviceMemory === "number" && nav.deviceMemory <= 2;
-    const slowNet = nav.connection?.saveData === true ||
+    const slowNet =
+      nav.connection?.saveData === true ||
       nav.connection?.effectiveType === "2g" ||
       nav.connection?.effectiveType === "slow-2g";
 
@@ -70,7 +72,10 @@ export function HeavyGate({
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    if (typeof IntersectionObserver === "undefined") { setInView(true); return; }
+    if (typeof IntersectionObserver === "undefined") {
+      setInView(true);
+      return;
+    }
 
     const io = new IntersectionObserver(
       (entries) => {
@@ -79,7 +84,7 @@ export function HeavyGate({
           setInView(entry.isIntersecting);
         }
       },
-      { rootMargin }
+      { rootMargin },
     );
     io.observe(el);
     return () => io.disconnect();
@@ -88,7 +93,7 @@ export function HeavyGate({
   const allow = !desktopOnly || (desktop && !lowEnd);
 
   return (
-    <Tag ref={ref as any} className={className}>
+    <Tag ref={ref as never} className={className}>
       {allow && inView ? <Suspense fallback={fallback}>{children}</Suspense> : fallback}
     </Tag>
   );

@@ -21,9 +21,7 @@ interface RadialOrbitalTimelineProps {
   timelineData: TimelineItem[];
 }
 
-export default function RadialOrbitalTimeline({
-  timelineData,
-}: RadialOrbitalTimelineProps) {
+export default function RadialOrbitalTimeline({ timelineData }: RadialOrbitalTimelineProps) {
   const [expandedItems, setExpandedItems] = useState<Record<number, boolean>>({});
   const [rotationAngle, setRotationAngle] = useState(0);
   const [autoRotate, setAutoRotate] = useState(true);
@@ -86,9 +84,12 @@ export default function RadialOrbitalTimeline({
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
-    const observer = new IntersectionObserver(([entry]) => {
-      setInView(entry.isIntersecting);
-    }, { threshold: 0 });
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setInView(entry.isIntersecting);
+      },
+      { threshold: 0 },
+    );
     observer.observe(el);
     return () => observer.disconnect();
   }, []);
@@ -139,7 +140,9 @@ export default function RadialOrbitalTimeline({
     const x = Number((radius * Math.cos(radian)).toFixed(2));
     const y = Number((radius * Math.sin(radian)).toFixed(2));
     const zIndex = Math.round(100 + 50 * Math.cos(radian));
-    const opacity = Number((Math.max(0.4, Math.min(1, 0.4 + 0.6 * ((1 + Math.sin(radian)) / 2)))).toFixed(3));
+    const opacity = Number(
+      Math.max(0.4, Math.min(1, 0.4 + 0.6 * ((1 + Math.sin(radian)) / 2))).toFixed(3),
+    );
     return { x, y, angle, zIndex, opacity };
   };
 
@@ -252,22 +255,16 @@ export default function RadialOrbitalTimeline({
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-px h-3 bg-white/50" />
                     <CardHeader className="pb-2">
                       <div className="flex justify-between items-center">
-                        <Badge
-                          className={`px-2 text-xs ${getStatusStyles(item.status)}`}
-                        >
+                        <Badge className={`px-2 text-xs ${getStatusStyles(item.status)}`}>
                           {item.status === "completed"
                             ? "COMPLETE"
                             : item.status === "in-progress"
                               ? "IN PROGRESS"
                               : "PENDING"}
                         </Badge>
-                        <span className="text-xs font-mono text-white/50">
-                          {item.date}
-                        </span>
+                        <span className="text-xs font-mono text-white/50">{item.date}</span>
                       </div>
-                      <CardTitle className="text-sm mt-2 text-white">
-                        {item.title}
-                      </CardTitle>
+                      <CardTitle className="text-sm mt-2 text-white">{item.title}</CardTitle>
                     </CardHeader>
                     <CardContent className="text-xs text-white/80">
                       <p>{item.content}</p>
@@ -298,9 +295,7 @@ export default function RadialOrbitalTimeline({
                           </div>
                           <div className="flex flex-wrap gap-1">
                             {item.relatedIds.map((relatedId) => {
-                              const relatedItem = timelineData.find(
-                                (i) => i.id === relatedId,
-                              );
+                              const relatedItem = timelineData.find((i) => i.id === relatedId);
                               return (
                                 <Button
                                   key={relatedId}
@@ -313,10 +308,7 @@ export default function RadialOrbitalTimeline({
                                   }}
                                 >
                                   {relatedItem?.title}
-                                  <ArrowRight
-                                    size={8}
-                                    className="ml-1 text-white/60"
-                                  />
+                                  <ArrowRight size={8} className="ml-1 text-white/60" />
                                 </Button>
                               );
                             })}

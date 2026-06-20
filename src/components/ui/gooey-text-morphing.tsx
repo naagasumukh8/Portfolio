@@ -83,16 +83,19 @@ export function GooeyText({
       }
     }
 
-    const observer = new IntersectionObserver(([entry]) => {
-      const wasIntersecting = isIntersecting;
-      isIntersecting = entry.isIntersecting;
-      if (isIntersecting && !wasIntersecting) {
-        cancelAnimationFrame(rafId);
-        rafId = requestAnimationFrame(animate);
-      } else if (!isIntersecting) {
-        cancelAnimationFrame(rafId);
-      }
-    }, { threshold: 0 });
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        const wasIntersecting = isIntersecting;
+        isIntersecting = entry.isIntersecting;
+        if (isIntersecting && !wasIntersecting) {
+          cancelAnimationFrame(rafId);
+          rafId = requestAnimationFrame(animate);
+        } else if (!isIntersecting) {
+          cancelAnimationFrame(rafId);
+        }
+      },
+      { threshold: 0 },
+    );
 
     if (text1Ref.current) {
       observer.observe(text1Ref.current);
@@ -121,16 +124,13 @@ export function GooeyText({
         </defs>
       </svg>
 
-      <div
-        className="flex items-center justify-center"
-        style={{ filter: "url(#threshold)" }}
-      >
+      <div className="flex items-center justify-center" style={{ filter: "url(#threshold)" }}>
         <span
           ref={text1Ref}
           className={cn(
             "absolute inline-block select-none text-center text-6xl md:text-[60pt]",
             "text-foreground",
-            textClassName
+            textClassName,
           )}
         />
         <span
@@ -138,7 +138,7 @@ export function GooeyText({
           className={cn(
             "absolute inline-block select-none text-center text-6xl md:text-[60pt]",
             "text-foreground",
-            textClassName
+            textClassName,
           )}
         />
       </div>

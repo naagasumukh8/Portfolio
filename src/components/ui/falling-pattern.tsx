@@ -25,24 +25,50 @@ export function FallingPattern({
     ys.forEach((y) => {
       rows.push(`radial-gradient(4px 100px at 0px ${y}px, ${color}, transparent)`);
       rows.push(`radial-gradient(4px 100px at 300px ${y}px, ${color}, transparent)`);
-      rows.push(`radial-gradient(1.5px 1.5px at 150px ${y / 2}px, ${color} 100%, transparent 150%)`);
+      rows.push(
+        `radial-gradient(1.5px 1.5px at 150px ${y / 2}px, ${color} 100%, transparent 150%)`,
+      );
     });
     return rows.join(", ");
   };
 
   const backgroundSizes = [
-    "300px 235px","300px 235px","300px 235px",
-    "300px 252px","300px 252px","300px 252px",
-    "300px 150px","300px 150px","300px 150px",
-    "300px 253px","300px 253px","300px 253px",
-    "300px 204px","300px 204px","300px 204px",
-    "300px 134px","300px 134px","300px 134px",
-    "300px 179px","300px 179px","300px 179px",
-    "300px 299px","300px 299px","300px 299px",
-    "300px 215px","300px 215px","300px 215px",
-    "300px 281px","300px 281px","300px 281px",
-    "300px 158px","300px 158px","300px 158px",
-    "300px 210px","300px 210px","300px 210px",
+    "300px 235px",
+    "300px 235px",
+    "300px 235px",
+    "300px 252px",
+    "300px 252px",
+    "300px 252px",
+    "300px 150px",
+    "300px 150px",
+    "300px 150px",
+    "300px 253px",
+    "300px 253px",
+    "300px 253px",
+    "300px 204px",
+    "300px 204px",
+    "300px 204px",
+    "300px 134px",
+    "300px 134px",
+    "300px 134px",
+    "300px 179px",
+    "300px 179px",
+    "300px 179px",
+    "300px 299px",
+    "300px 299px",
+    "300px 299px",
+    "300px 215px",
+    "300px 215px",
+    "300px 215px",
+    "300px 281px",
+    "300px 281px",
+    "300px 281px",
+    "300px 158px",
+    "300px 158px",
+    "300px 158px",
+    "300px 210px",
+    "300px 210px",
+    "300px 210px",
   ].join(", ");
 
   const startPositions =

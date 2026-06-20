@@ -19,7 +19,7 @@ export function PaperShaderBackdrop() {
       className="pointer-events-none fixed inset-0 -z-50 overflow-hidden bg-[#07121F]"
     >
       {/* Compositor-driven smooth CSS animated auroras */}
-      <div 
+      <div
         className="absolute -inset-[30%] opacity-40"
         style={{
           background: `radial-gradient(45% 45% at 20% 30%, rgba(124,110,255,0.30) 0%, transparent 100%),
@@ -33,7 +33,8 @@ export function PaperShaderBackdrop() {
       <div
         className="absolute inset-0 bg-radial-vignette"
         style={{
-          background: "radial-gradient(ellipse at center, rgba(7,18,31,0.2) 0%, rgba(7,18,31,0.85) 100%)",
+          background:
+            "radial-gradient(ellipse at center, rgba(7,18,31,0.2) 0%, rgba(7,18,31,0.85) 100%)",
         }}
       />
       <style>{`

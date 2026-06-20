@@ -2,14 +2,8 @@ import { motion } from "framer-motion";
 
 import React, { useEffect, useRef } from "react";
 
-
-
-
-
 interface AnimatedGradientBackgroundProps {
-
-
-   /** 
+  /** 
 
     * Initial size of the radial gradient, defining the starting width. 
 
@@ -17,13 +11,9 @@ interface AnimatedGradientBackgroundProps {
 
     */
 
-   startingGap?: number;
+  startingGap?: number;
 
-
-
-
-
-   /**
+  /**
 
     * Enables or disables the breathing animation effect.
 
@@ -31,13 +21,9 @@ interface AnimatedGradientBackgroundProps {
 
     */
 
-   Breathing?: boolean;
+  Breathing?: boolean;
 
-
-
-
-
-   /**
+  /**
 
     * Array of colors to use in the radial gradient.
 
@@ -47,13 +33,9 @@ interface AnimatedGradientBackgroundProps {
 
     */
 
-   gradientColors?: string[];
+  gradientColors?: string[];
 
-
-
-
-
-   /**
+  /**
 
     * Array of percentage stops corresponding to each color in `gradientColors`.
 
@@ -63,13 +45,9 @@ interface AnimatedGradientBackgroundProps {
 
     */
 
-   gradientStops?: number[];
+  gradientStops?: number[];
 
-
-
-
-
-   /**
+  /**
 
     * Speed of the breathing animation. 
 
@@ -79,13 +57,9 @@ interface AnimatedGradientBackgroundProps {
 
     */
 
-   animationSpeed?: number;
+  animationSpeed?: number;
 
-
-
-
-
-   /**
+  /**
 
     * Maximum range for the breathing animation in percentage points.
 
@@ -95,13 +69,9 @@ interface AnimatedGradientBackgroundProps {
 
     */
 
-   breathingRange?: number;
+  breathingRange?: number;
 
-
-
-
-
-   /**
+  /**
 
     * Additional inline styles for the gradient container.
 
@@ -109,13 +79,9 @@ interface AnimatedGradientBackgroundProps {
 
     */
 
-   containerStyle?: React.CSSProperties;
+  containerStyle?: React.CSSProperties;
 
-
-
-
-
-   /**
+  /**
 
     * Additional class names for the gradient container.
 
@@ -123,18 +89,9 @@ interface AnimatedGradientBackgroundProps {
 
     */
 
-   containerClassName?: string;
+  containerClassName?: string;
 
-
-
-
-
-
-
-
-
-
-   /**
+  /**
 
     * Additional top offset for the gradient container form the top to have a more flexible control over the gradient.
 
@@ -142,14 +99,8 @@ interface AnimatedGradientBackgroundProps {
 
     */
 
-   topOffset?: number;
-
-
+  topOffset?: number;
 }
-
-
-
-
 
 /**
 
@@ -172,236 +123,149 @@ interface AnimatedGradientBackgroundProps {
  */
 
 const AnimatedGradientBackground: React.FC<AnimatedGradientBackgroundProps> = ({
+  startingGap = 125,
 
-   startingGap = 125,
+  Breathing = false,
 
-   Breathing = false,
+  gradientColors = ["#0A0A0A", "#2979FF", "#FF80AB", "#FF6D00", "#FFD600", "#00E676", "#3D5AFE"],
 
-   gradientColors = [
+  gradientStops = [35, 50, 60, 70, 80, 90, 100],
 
-      "#0A0A0A",
+  animationSpeed = 0.02,
 
-      "#2979FF",
+  breathingRange = 5,
 
-      "#FF80AB",
+  containerStyle = {},
 
-      "#FF6D00",
+  topOffset = 0,
 
-      "#FFD600",
-
-      "#00E676",
-
-      "#3D5AFE"
-
-   ],
-
-   gradientStops = [35, 50, 60, 70, 80, 90, 100],
-
-   animationSpeed = 0.02,
-
-   breathingRange = 5,
-
-   containerStyle = {},
-
-   topOffset = 0,
-
-   containerClassName = "",
-
+  containerClassName = "",
 }) => {
+  // Validation: Ensure gradientStops and gradientColors lengths match
 
-
-
-
-
-
-
-
-
-
-   // Validation: Ensure gradientStops and gradientColors lengths match
-
-   if (gradientColors.length !== gradientStops.length) {
-
-      throw new Error(
-
-         `GradientColors and GradientStops must have the same length.
+  if (gradientColors.length !== gradientStops.length) {
+    throw new Error(
+      `GradientColors and GradientStops must have the same length.
 
      Received gradientColors length: ${gradientColors.length},
 
-     gradientStops length: ${gradientStops.length}`
+     gradientStops length: ${gradientStops.length}`,
+    );
+  }
 
-      );
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
-   }
+  useEffect(() => {
+    const el = containerRef.current;
 
+    if (!el) return;
 
+    if (!Breathing) {
+      const gradientStopsString = gradientStops
 
+        .map((stop, index) => `${gradientColors[index]} ${stop}%`)
 
+        .join(", ");
 
-   const containerRef = useRef<HTMLDivElement | null>(null);
+      const gradient = `radial-gradient(${startingGap}% ${startingGap + topOffset}% at 50% 20%, ${gradientStopsString})`;
 
+      el.style.background = gradient;
 
+      return;
+    }
 
+    let animationFrame: number;
 
+    let width = startingGap;
 
-   useEffect(() => {
+    let directionWidth = 1;
 
-      const el = containerRef.current;
+    let isIntersecting = false;
 
-      if (!el) return;
+    const animateGradient = () => {
+      if (!isIntersecting) return;
 
+      if (width >= startingGap + breathingRange) directionWidth = -1;
 
+      if (width <= startingGap - breathingRange) directionWidth = 1;
 
-      if (!Breathing) {
+      width += directionWidth * animationSpeed;
 
-         const gradientStopsString = gradientStops
+      const gradientStopsString = gradientStops
 
-            .map((stop, index) => `${gradientColors[index]} ${stop}%`)
+        .map((stop, index) => `${gradientColors[index]} ${stop}%`)
 
-            .join(", ");
+        .join(", ");
 
-         const gradient = `radial-gradient(${startingGap}% ${startingGap+topOffset}% at 50% 20%, ${gradientStopsString})`;
+      const gradient = `radial-gradient(${width}% ${width + topOffset}% at 50% 20%, ${gradientStopsString})`;
 
-         el.style.background = gradient;
+      el.style.background = gradient;
 
-         return;
+      animationFrame = requestAnimationFrame(animateGradient);
+    };
 
-      }
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        const wasIntersecting = isIntersecting;
 
+        isIntersecting = entry.isIntersecting;
 
+        if (isIntersecting && !wasIntersecting) {
+          cancelAnimationFrame(animationFrame);
 
-      let animationFrame: number;
+          animationFrame = requestAnimationFrame(animateGradient);
+        } else if (!isIntersecting) {
+          cancelAnimationFrame(animationFrame);
+        }
+      },
+      { threshold: 0 },
+    );
 
-      let width = startingGap;
+    observer.observe(el);
 
-      let directionWidth = 1;
+    return () => {
+      observer.disconnect();
 
-      let isIntersecting = false;
+      cancelAnimationFrame(animationFrame);
+    };
+  }, [
+    startingGap,
+    Breathing,
+    gradientColors,
+    gradientStops,
+    animationSpeed,
+    breathingRange,
+    topOffset,
+  ]);
 
+  return (
+    <motion.div
+      key="animated-gradient-background"
+      initial={{
+        opacity: 0,
 
+        scale: 1.5,
+      }}
+      animate={{
+        opacity: 1,
 
-      const animateGradient = () => {
-
-         if (!isIntersecting) return;
-
-         if (width >= startingGap + breathingRange) directionWidth = -1;
-
-         if (width <= startingGap - breathingRange) directionWidth = 1;
-
-         width += directionWidth * animationSpeed;
-
-
-
-         const gradientStopsString = gradientStops
-
-            .map((stop, index) => `${gradientColors[index]} ${stop}%`)
-
-            .join(", ");
-
-
-
-         const gradient = `radial-gradient(${width}% ${width+topOffset}% at 50% 20%, ${gradientStopsString})`;
-
-         el.style.background = gradient;
-
-
-
-         animationFrame = requestAnimationFrame(animateGradient);
-
-      };
-
-
-
-      const observer = new IntersectionObserver(([entry]) => {
-
-         const wasIntersecting = isIntersecting;
-
-         isIntersecting = entry.isIntersecting;
-
-         if (isIntersecting && !wasIntersecting) {
-
-            cancelAnimationFrame(animationFrame);
-
-            animationFrame = requestAnimationFrame(animateGradient);
-
-         } else if (!isIntersecting) {
-
-            cancelAnimationFrame(animationFrame);
-
-         }
-
-      }, { threshold: 0 });
-
-      observer.observe(el);
-
-
-
-      return () => {
-
-         observer.disconnect();
-
-         cancelAnimationFrame(animationFrame);
-
-      };
-
-   }, [startingGap, Breathing, gradientColors, gradientStops, animationSpeed, breathingRange, topOffset]);
-
-
-
-
-
-   return (
-
-      <motion.div
-
-         key="animated-gradient-background"
-
-         initial={{
-
-            opacity: 0,
-
-            scale: 1.5,
-
-         }}
-
-         animate={{
-
-            opacity: 1,
-
-            scale: 1,
-
-            transition: {
-
-               duration: 2,
-
-               ease: [0.25, 0.1, 0.25, 1], // Cubic bezier easing
-
-             },
-
-         }}
-
-         className={`absolute inset-0 overflow-hidden ${containerClassName}`}
-
-      >
-
-         <div
-
-            ref={containerRef}
-
-            style={containerStyle}
-
-            className="absolute inset-0 transition-transform"
-
-         />
-
-      </motion.div>
-
-   );
-
+        scale: 1,
+
+        transition: {
+          duration: 2,
+
+          ease: [0.25, 0.1, 0.25, 1], // Cubic bezier easing
+        },
+      }}
+      className={`absolute inset-0 overflow-hidden ${containerClassName}`}
+    >
+      <div
+        ref={containerRef}
+        style={containerStyle}
+        className="absolute inset-0 transition-transform"
+      />
+    </motion.div>
+  );
 };
-
-
-
-
 
 export default AnimatedGradientBackground;

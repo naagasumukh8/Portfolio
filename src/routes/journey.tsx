@@ -5,7 +5,10 @@ export const Route = createFileRoute("/journey")({
   head: () => ({
     meta: [
       { title: "Journey — Naaga Sumukh B S" },
-      { name: "description", content: "Timeline, recognition and credentials of Naaga Sumukh B S." },
+      {
+        name: "description",
+        content: "Timeline, recognition and credentials of Naaga Sumukh B S.",
+      },
       { property: "og:title", content: "Journey — Naaga Sumukh B S" },
       { property: "og:description", content: "Timeline, recognition and credentials." },
       { property: "og:url", content: "https://naagasumukh.engineer/journey" },

@@ -21,7 +21,8 @@ const init = async (engine: Engine) => {
 };
 
 const Inner = (props: ParticlesProps) => {
-  const { id, className, background, minSize, maxSize, speed, particleColor, particleDensity } = props;
+  const { id, className, background, minSize, maxSize, speed, particleColor, particleDensity } =
+    props;
   const { loaded } = useParticlesProvider();
   const generatedId = useId();
   if (!loaded) return null;

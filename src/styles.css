@@ -40,8 +40,8 @@
   --radius: 0.125rem;
   --background: oklch(0 0 0);
   --foreground: oklch(1 0 0);
-  --surface: oklch(0.10 0 0);
-  --card: oklch(0.10 0 0);
+  --surface: oklch(0.1 0 0);
+  --card: oklch(0.1 0 0);
   --card-foreground: oklch(1 0 0);
   --popover: oklch(0.08 0 0);
   --popover-foreground: oklch(1 0 0);
@@ -90,7 +90,10 @@
     transform: translateZ(0);
   }
   /* Custom cursor disabled — was causing flicker/lag on some setups. Default cursor is clean and reliable. */
-  h1, h2, h3, h4 {
+  h1,
+  h2,
+  h3,
+  h4 {
     font-family: var(--font-display);
     letter-spacing: -0.02em;
     text-transform: uppercase;
@@ -106,42 +109,71 @@
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background: rgba(255,255,255,0.15);
+    background: rgba(255, 255, 255, 0.15);
     border-radius: 9999px;
     transition: background 0.2s ease;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(255,255,255,0.35);
+    background: rgba(255, 255, 255, 0.35);
   }
   /* iOS spring for ALL interactive elements — feels tactile and native */
-  a, button, [role="button"], summary, label[for], [data-hover] {
+  a,
+  button,
+  [role="button"],
+  summary,
+  label[for],
+  [data-hover] {
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
   }
 }
 
 @layer utilities {
-  .font-display { font-family: var(--font-display); font-weight: 400; letter-spacing: -0.02em; }
-  .font-mono { font-family: var(--font-mono); }
+  .font-display {
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+  }
+  .font-mono {
+    font-family: var(--font-mono);
+  }
 
   /* Monochrome remap of legacy accent utilities — keeps 1276-line page coherent */
-  .text-violet { color: #ffffff; }
-  .text-gold { color: #ffffff; }
-  .bg-violet { background-color: #ffffff; }
-  .bg-gold { background-color: #ffffff; }
-  .bg-surface { background-color: #0a0a0a; }
-  .border-violet { border-color: #ffffff; }
-  .text-muted-soft { color: #8a8a8a; }
-  .text-body { color: #ffffff; }
+  .text-violet {
+    color: #ffffff;
+  }
+  .text-gold {
+    color: #ffffff;
+  }
+  .bg-violet {
+    background-color: #ffffff;
+  }
+  .bg-gold {
+    background-color: #ffffff;
+  }
+  .bg-surface {
+    background-color: #0a0a0a;
+  }
+  .border-violet {
+    border-color: #ffffff;
+  }
+  .text-muted-soft {
+    color: #8a8a8a;
+  }
+  .text-body {
+    color: #ffffff;
+  }
 
   .glow-violet {
-    box-shadow: 0 0 0 1px rgba(255,255,255,0.9), 0 20px 60px -20px rgba(255,255,255,0.25);
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.9),
+      0 20px 60px -20px rgba(255, 255, 255, 0.25);
   }
   .glow-gold {
-    box-shadow: 0 0 0 1px rgba(255,255,255,0.7);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.7);
   }
   .text-glow-violet {
-    text-shadow: 0 0 30px rgba(255,255,255,0.35);
+    text-shadow: 0 0 30px rgba(255, 255, 255, 0.35);
   }
 
   .gradient-text {
@@ -153,8 +185,8 @@
 
   .grid-bg {
     background-image:
-      linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+      linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
     background-size: 60px 60px;
   }
 
@@ -169,45 +201,117 @@
   }
 
   @keyframes glitch {
-    0%, 100% { transform: translate(0); text-shadow: 0 0 0 transparent; }
-    20% { transform: translate(-2px, 1px); text-shadow: 2px 0 #ffffff, -2px 0 #ffffff; }
-    40% { transform: translate(2px, -1px); text-shadow: -2px 0 #ffffff, 2px 0 #ffffff; }
-    60% { transform: translate(0); text-shadow: 0 0 0 transparent; }
+    0%,
+    100% {
+      transform: translate(0);
+      text-shadow: 0 0 0 transparent;
+    }
+    20% {
+      transform: translate(-2px, 1px);
+      text-shadow:
+        2px 0 #ffffff,
+        -2px 0 #ffffff;
+    }
+    40% {
+      transform: translate(2px, -1px);
+      text-shadow:
+        -2px 0 #ffffff,
+        2px 0 #ffffff;
+    }
+    60% {
+      transform: translate(0);
+      text-shadow: 0 0 0 transparent;
+    }
   }
-  .animate-glitch { animation: glitch 0.4s ease-in-out; }
+  .animate-glitch {
+    animation: glitch 0.4s ease-in-out;
+  }
 
   @keyframes ticker {
-    from { transform: translateX(0); }
-    to { transform: translateX(-50%); }
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
   }
   @keyframes ticker-reverse {
-    from { transform: translateX(-50%); }
-    to { transform: translateX(0); }
+    from {
+      transform: translateX(-50%);
+    }
+    to {
+      transform: translateX(0);
+    }
   }
-  .animate-ticker { animation: ticker 40s linear infinite; will-change: transform; transform: translateZ(0); }
-  .animate-ticker-reverse { animation: ticker-reverse 40s linear infinite; will-change: transform; transform: translateZ(0); }
+  .animate-ticker {
+    animation: ticker 40s linear infinite;
+    will-change: transform;
+    transform: translateZ(0);
+  }
+  .animate-ticker-reverse {
+    animation: ticker-reverse 40s linear infinite;
+    will-change: transform;
+    transform: translateZ(0);
+  }
 
-  @keyframes spin-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-  .animate-spin-slow { animation: spin-slow 12s linear infinite; will-change: transform; transform: translateZ(0); }
+  @keyframes spin-slow {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  .animate-spin-slow {
+    animation: spin-slow 12s linear infinite;
+    will-change: transform;
+    transform: translateZ(0);
+  }
 
   @keyframes orbit {
-    from { transform: rotate(0deg) translateX(140px) rotate(0deg); }
-    to { transform: rotate(360deg) translateX(140px) rotate(-360deg); }
+    from {
+      transform: rotate(0deg) translateX(140px) rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg) translateX(140px) rotate(-360deg);
+    }
   }
 
   @keyframes pulse-dot {
-    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(255,255,255,0.6); }
-    50% { opacity: 0.7; box-shadow: 0 0 0 8px rgba(255,255,255,0); }
+    0%,
+    100% {
+      opacity: 1;
+      box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.6);
+    }
+    50% {
+      opacity: 0.7;
+      box-shadow: 0 0 0 8px rgba(255, 255, 255, 0);
+    }
   }
-  .pulse-dot { animation: pulse-dot 2s ease-in-out infinite; }
+  .pulse-dot {
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
 
   @keyframes scroll-line {
-    0% { transform: scaleY(0); transform-origin: top; }
-    50% { transform: scaleY(1); transform-origin: top; }
-    51% { transform-origin: bottom; }
-    100% { transform: scaleY(0); transform-origin: bottom; }
+    0% {
+      transform: scaleY(0);
+      transform-origin: top;
+    }
+    50% {
+      transform: scaleY(1);
+      transform-origin: top;
+    }
+    51% {
+      transform-origin: bottom;
+    }
+    100% {
+      transform: scaleY(0);
+      transform-origin: bottom;
+    }
   }
-  .scroll-line { animation: scroll-line 2s ease-in-out infinite; }
+  .scroll-line {
+    animation: scroll-line 2s ease-in-out infinite;
+  }
 
   .tilt-card {
     transform-style: preserve-3d;
@@ -232,7 +336,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
@@ -240,25 +346,35 @@
 }
 
 @media (hover: none) {
-  .tilt-card { transform: none !important; }
+  .tilt-card {
+    transform: none !important;
+  }
 }
 
 @keyframes spotlight {
-  0% { opacity: 0; transform: translate(-72%, -62%) scale(0.5); }
-  100% { opacity: 1; transform: translate(-50%, -40%) scale(1); }
+  0% {
+    opacity: 0;
+    transform: translate(-72%, -62%) scale(0.5);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -40%) scale(1);
+  }
 }
-.animate-spotlight { animation: spotlight 2s ease 0.75s 1 forwards; }
+.animate-spotlight {
+  animation: spotlight 2s ease 0.75s 1 forwards;
+}
 
 /* ============ APPLE LIQUID GLASS UTILITIES (site-wide) ============ */
 @utility glass-surface {
-  background: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
   backdrop-filter: blur(8px) saturate(130%);
   -webkit-backdrop-filter: blur(8px) saturate(130%);
-  border: 1px solid rgba(255,255,255,0.12);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow:
-    0 12px 40px -12px rgba(0,0,0,0.5),
-    inset 0 1px 0 rgba(255,255,255,0.22),
-    inset 0 -1px 0 rgba(0,0,0,0.3);
+    0 12px 40px -12px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3);
 }
 
 @utility glass-pill {
@@ -272,19 +388,19 @@
   font-size: 11px;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: rgba(255,255,255,0.95);
-  background: linear-gradient(180deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.03) 100%);
+  color: rgba(255, 255, 255, 0.95);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.03) 100%);
   backdrop-filter: blur(6px) saturate(140%);
   -webkit-backdrop-filter: blur(6px) saturate(140%);
-  border: 1px solid rgba(255,255,255,0.18);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   box-shadow:
-    0 6px 20px -8px rgba(0,0,0,0.55),
-    inset 0 1px 0 rgba(255,255,255,0.28),
-    inset 0 -1px 0 rgba(0,0,0,0.35);
+    0 6px 20px -8px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.35);
   /* iOS spring — feels alive on press/release */
   transition:
-    transform 0.5s cubic-bezier(0.34,1.56,0.64,1),
-    box-shadow 0.4s cubic-bezier(0.16,1,0.3,1),
+    transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1),
     border-color 0.3s ease,
     background 0.3s ease;
   cursor: pointer;
@@ -293,37 +409,45 @@
 @utility glass-pill {
   &:hover {
     transform: translateY(-3px) scale(1.02);
-    border-color: rgba(255,255,255,0.32);
+    border-color: rgba(255, 255, 255, 0.32);
     box-shadow:
-      0 18px 48px -10px rgba(124,110,255,0.5),
-      inset 0 1px 0 rgba(255,255,255,0.38);
+      0 18px 48px -10px rgba(124, 110, 255, 0.5),
+      inset 0 1px 0 rgba(255, 255, 255, 0.38);
   }
   &:active {
     transform: translateY(1px) scale(0.97);
-    transition: transform 0.08s ease-out, box-shadow 0.08s ease-out;
+    transition:
+      transform 0.08s ease-out,
+      box-shadow 0.08s ease-out;
   }
 }
 
 @utility glass-row {
-  background: linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
   backdrop-filter: blur(5px) saturate(125%);
   -webkit-backdrop-filter: blur(5px) saturate(125%);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 1.25rem;
   /* Spring easing — lifts smoothly, settles with a micro-bounce */
   transition:
-    transform 0.55s cubic-bezier(0.34,1.45,0.64,1),
+    transform 0.55s cubic-bezier(0.34, 1.45, 0.64, 1),
     border-color 0.35s ease,
-    box-shadow 0.45s cubic-bezier(0.16,1,0.3,1),
+    box-shadow 0.45s cubic-bezier(0.16, 1, 0.3, 1),
     background 0.35s ease;
   will-change: transform;
 }
 @utility glass-row {
   &:hover {
     transform: translateY(-3px) scale(1.005);
-    border-color: rgba(255,255,255,0.18);
-    background: linear-gradient(180deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.02) 100%);
-    box-shadow: 0 24px 64px -20px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.12);
+    border-color: rgba(255, 255, 255, 0.18);
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.07) 0%,
+      rgba(255, 255, 255, 0.02) 100%
+    );
+    box-shadow:
+      0 24px 64px -20px rgba(0, 0, 0, 0.6),
+      0 0 0 1px rgba(255, 255, 255, 0.12);
   }
   &:active {
     transform: translateY(0) scale(0.99);
@@ -336,44 +460,77 @@
 /* iOS spring tap feedback — applied on ALL devices (not just touch).
    Gives every button a satisfying press-then-spring-back feel.
    The spring overshoot (1.56) mimics Apple's UIKit spring physics. */
-a, button, [role="button"], .tap-spring, [data-hover], [data-tap] {
+a,
+button,
+[role="button"],
+.tap-spring,
+[data-hover],
+[data-tap] {
   transition:
     transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
     opacity 0.2s ease;
 }
-a:active, button:active, [role="button"]:active,
-.tap-spring:active, [data-hover]:active, [data-tap]:active {
+a:active,
+button:active,
+[role="button"]:active,
+.tap-spring:active,
+[data-hover]:active,
+[data-tap]:active {
   transform: scale(0.95);
-  transition: transform 0.08s ease-out, opacity 0.08s ease-out;
+  transition:
+    transform 0.08s ease-out,
+    opacity 0.08s ease-out;
 }
 /* Stronger spring on coarse-pointer (mobile) — bigger press = more satisfying */
 @media (hover: none) and (pointer: coarse) {
-  a:active, button:active, [role="button"]:active,
-  .tap-spring:active, [data-hover]:active, [data-tap]:active {
+  a:active,
+  button:active,
+  [role="button"]:active,
+  .tap-spring:active,
+  [data-hover]:active,
+  [data-tap]:active {
     transform: scale(0.92);
   }
 }
 
 /* Ticker / marquee fade masks — soft edge-out on both sides. */
 .ticker-fade {
-  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 60px, #000 calc(100% - 60px), transparent 100%);
-          mask-image: linear-gradient(90deg, transparent 0, #000 60px, #000 calc(100% - 60px), transparent 100%);
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent 0,
+    #000 60px,
+    #000 calc(100% - 60px),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    90deg,
+    transparent 0,
+    #000 60px,
+    #000 calc(100% - 60px),
+    transparent 100%
+  );
 }
 
 /* Contact rows — hover expand + soft wash (desktop). Spring easing. */
 @media (hover: hover) {
   .glass-row.contact-row {
-    padding-top: 1.5rem; padding-bottom: 1.5rem;
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
     transition:
-      padding 380ms cubic-bezier(0.34,1.2,0.64,1),
+      padding 380ms cubic-bezier(0.34, 1.2, 0.64, 1),
       background 280ms ease,
-      transform 0.55s cubic-bezier(0.34,1.45,0.64,1),
+      transform 0.55s cubic-bezier(0.34, 1.45, 0.64, 1),
       border-color 0.35s ease,
-      box-shadow 0.45s cubic-bezier(0.16,1,0.3,1);
+      box-shadow 0.45s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .glass-row.contact-row:hover {
-    padding-top: 2rem; padding-bottom: 2rem;
-    background: linear-gradient(180deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.02) 100%) !important;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.07) 0%,
+      rgba(255, 255, 255, 0.02) 100%
+    ) !important;
   }
 }
 
@@ -386,39 +543,97 @@ a:active, button:active, [role="button"]:active,
  */
 @media (max-width: 767px) {
   /* 1) Noise overlay off */
-  [aria-hidden].pointer-events-none.fixed.inset-0.z-\[9999\] { display: none !important; }
+  [aria-hidden].pointer-events-none.fixed.inset-0.z-\[9999\] {
+    display: none !important;
+  }
 
   /* 2) Stop infinite spin on avatar rings + monument rotating border */
   .animate-spin-slow,
-  [style*="conic-gradient"][style*="animation"] { animation: none !important; }
-  .monument-card::before { animation: none !important; opacity: 0 !important; }
+  [style*="conic-gradient"][style*="animation"] {
+    animation: none !important;
+  }
+  .monument-card::before {
+    animation: none !important;
+    opacity: 0 !important;
+  }
 
   /* 3) Drop expensive backdrop-filter; keep the look with a slightly more opaque bg */
-  .glass-surface, .glass-pill, .glass-row {
+  .glass-surface,
+  .glass-pill,
+  .glass-row {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
-    background: linear-gradient(180deg, rgba(20,20,30,0.78) 0%, rgba(20,20,30,0.62) 100%) !important;
+    background: linear-gradient(
+      180deg,
+      rgba(20, 20, 30, 0.78) 0%,
+      rgba(20, 20, 30, 0.62) 100%
+    ) !important;
   }
 
   /* 4) Pause ALL background CSS animations — these are the #1 crash cause on old phones.
      auroraDrift (section backdrops), splashMesh (global CSS bg), dotsDrift, gridPan,
      splashFloat (WavingBalls), splashSpin (OrbitingDots), badgeShimmer, monAngleSpin.
      Content stays visible — animations simply freeze in place (looks fine). */
-  @keyframes auroraDrift { 0%, 100% { transform: none; } }
-  @keyframes splashMesh  { 0%, 100% { transform: none; } }
-  @keyframes dotsDrift   { 0%, 100% { transform: none; } }
-  @keyframes gridPan     { 0%, 100% { transform: none; } }
-  @keyframes splashFloat { 0%, 100% { transform: none; } }
-  @keyframes splashSpin  { 0%, 100% { transform: none; } }
-  @keyframes badgeShimmer { 0%, 100% { transform: translateX(-120%); } }
-  @keyframes monAngleSpin { 0%, 100% {} }
+  @keyframes auroraDrift {
+    0%,
+    100% {
+      transform: none;
+    }
+  }
+  @keyframes splashMesh {
+    0%,
+    100% {
+      transform: none;
+    }
+  }
+  @keyframes dotsDrift {
+    0%,
+    100% {
+      transform: none;
+    }
+  }
+  @keyframes gridPan {
+    0%,
+    100% {
+      transform: none;
+    }
+  }
+  @keyframes splashFloat {
+    0%,
+    100% {
+      transform: none;
+    }
+  }
+  @keyframes splashSpin {
+    0%,
+    100% {
+      transform: none;
+    }
+  }
+  @keyframes badgeShimmer {
+    0%,
+    100% {
+      transform: translateX(-120%);
+    }
+  }
+  @keyframes monAngleSpin {
+    0%,
+    100% {
+    }
+  }
 
   /* Reduce marquee/ticker speed on mobile — fewer repaints */
-  .animate-ticker        { animation-duration: 90s !important; }
-  .animate-ticker-reverse { animation-duration: 90s !important; }
+  .animate-ticker {
+    animation-duration: 90s !important;
+  }
+  .animate-ticker-reverse {
+    animation-duration: 90s !important;
+  }
 
   /* Eliminate will-change on mobile — it actually costs memory on low-RAM devices */
-  * { will-change: auto !important; }
+  * {
+    will-change: auto !important;
+  }
 }
 
 /* ============ LOW-END DEVICE HOOKS ============
