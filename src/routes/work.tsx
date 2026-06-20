@@ -8,9 +8,9 @@ export const Route = createFileRoute("/work")({
       { name: "description", content: "Selected work — AI, ML, automation and interactive experiments by Naaga Sumukh B S." },
       { property: "og:title", content: "Work — Naaga Sumukh B S" },
       { property: "og:description", content: "Selected projects across AI/ML, automation, and interactive 3D." },
-      { property: "og:url", content: "https://naagasumukh.lovable.app/work" },
+      { property: "og:url", content: "https://naagasumukh.engineer/work" },
     ],
-    links: [{ rel: "canonical", href: "https://naagasumukh.lovable.app/work" }],
+    links: [{ rel: "canonical", href: "https://naagasumukh.engineer/work" }],
   }),
   component: () => (
     <PortfolioShell>

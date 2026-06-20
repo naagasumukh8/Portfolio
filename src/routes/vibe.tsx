@@ -8,9 +8,9 @@ export const Route = createFileRoute("/vibe")({
       { name: "description", content: "An interactive playground of shaders, image trails and motion." },
       { property: "og:title", content: "Vibe — Naaga Sumukh B S" },
       { property: "og:description", content: "Shaders, image trails and motion experiments." },
-      { property: "og:url", content: "https://naagasumukh.lovable.app/vibe" },
+      { property: "og:url", content: "https://naagasumukh.engineer/vibe" },
     ],
-    links: [{ rel: "canonical", href: "https://naagasumukh.lovable.app/vibe" }],
+    links: [{ rel: "canonical", href: "https://naagasumukh.engineer/vibe" }],
   }),
   component: () => (
     <PortfolioShell>

@@ -8,9 +8,9 @@ export const Route = createFileRoute("/about")({
       { name: "description", content: "About Naaga Sumukh B S — AI/ML engineer, NMIT Bengaluru. Skills, story, and how I work." },
       { property: "og:title", content: "About — Naaga Sumukh B S" },
       { property: "og:description", content: "About me, my skills and how I build intelligent systems." },
-      { property: "og:url", content: "https://naagasumukh.lovable.app/about" },
+      { property: "og:url", content: "https://naagasumukh.engineer/about" },
     ],
-    links: [{ rel: "canonical", href: "https://naagasumukh.lovable.app/about" }],
+    links: [{ rel: "canonical", href: "https://naagasumukh.engineer/about" }],
   }),
   component: () => (
     <PortfolioShell>

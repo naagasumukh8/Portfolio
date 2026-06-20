@@ -109,7 +109,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           name: "Naaga Sumukh B S",
           jobTitle: "AI/ML Engineer",
           description: "AI/ML engineer building intelligent systems. Bengaluru-based.",
-          url: "https://naagasumukh.lovable.app",
+          url: "https://naagasumukh.engineer",
           address: {
             "@type": "PostalAddress",
             addressLocality: "Bengaluru",
@@ -128,7 +128,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "@context": "https://schema.org",
           "@type": "WebSite",
           name: "Naaga Sumukh B S — AI/ML Engineer",
-          url: "https://naagasumukh.lovable.app",
+          url: "https://naagasumukh.engineer",
           author: { "@type": "Person", name: "Naaga Sumukh B S" },
         }),
       },
