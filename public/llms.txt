@@ -1,0 +1,12 @@
+# Naaga Sumukh B S — AI/ML Engineer
+
+> Portfolio of Naaga Sumukh B S, an AI/ML engineer based in Bengaluru building intelligent systems. Selected work, professional journey, recognition, and contact.
+
+## Pages
+
+- [Home](/): Landing page introducing Naaga Sumukh and the work.
+- [About](/about): Background, skills, and how he builds.
+- [Work](/work): Selected projects across AI/ML, automation, and interactive 3D.
+- [Journey](/journey): Timeline, recognition, and credentials.
+- [Vibe](/vibe): Motion, shader, and interactive experiments.
+- [Contact](/contact): How to get in touch.
