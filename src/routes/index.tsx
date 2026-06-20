@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { lazy, useEffect, useRef, useState, type MouseEvent, type ReactNode } from "react";
+import { lazy, useEffect, useRef, useState, createContext, useContext, type MouseEvent, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { motion, useScroll, useTransform, type MotionValue } from "framer-motion";
 import Lenis from "lenis";
@@ -23,6 +23,61 @@ import { LiquidButton } from "@/components/ui/liquid-glass-button";
 import { PaperShaderBackdrop } from "@/components/ui/paper-shader-backdrop";
 import { GLSLHills } from "@/components/ui/glsl-hills";
 import { LampContainer } from "@/components/ui/lamp";
+/* ============ GRAPHICS CONTROLS ============ */
+export const GraphicsContext = createContext<{
+  graphicsMode: "standard" | "interactive-3d";
+  setGraphicsMode: (mode: "standard" | "interactive-3d") => void;
+}>({
+  graphicsMode: "standard",
+  setGraphicsMode: () => {},
+});
+
+export function useGraphics() {
+  return useContext(GraphicsContext);
+}
+
+export function GraphicsToggle() {
+  const { graphicsMode, setGraphicsMode } = useGraphics();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
+
+  return (
+    <div className="fixed bottom-6 left-6 z-[99] flex items-center gap-2 rounded-full border border-white/10 bg-black/60 px-3 py-2 text-[10px] font-mono uppercase tracking-widest text-body shadow-lg backdrop-blur-md transition-all hover:border-white/20">
+      <span className="text-muted-soft">Graphics:</span>
+      <button
+        onClick={() => setGraphicsMode("standard")}
+        className={`rounded-full px-2.5 py-1 transition-all ${
+          graphicsMode === "standard"
+            ? "bg-white/10 text-white font-bold"
+            : "text-muted-soft hover:text-white"
+        }`}
+      >
+        Standard (Smooth)
+      </button>
+      <button
+        onClick={() => setGraphicsMode("interactive-3d")}
+        className={`relative rounded-full px-2.5 py-1 transition-all ${
+          graphicsMode === "interactive-3d"
+            ? "bg-violet/20 text-white font-bold ring-1 ring-violet/40"
+            : "text-muted-soft hover:text-white"
+        }`}
+      >
+        Interactive 3D
+        {graphicsMode === "interactive-3d" && (
+          <span className="absolute -top-0.5 -right-0.5 flex h-1.5 w-1.5">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#22ff88] opacity-75" />
+            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#22ff88]" />
+          </span>
+        )}
+      </button>
+    </div>
+  );
+}
 
 /* ============ PREMIUM SECTION BACKDROPS ============
    Each backdrop fades in via IntersectionObserver when its section enters
@@ -352,8 +407,10 @@ function Typing({ text, className = "", speed = 18 }: { text: string; className?
  * and starts on frame 1 — no async waterfall, no jank window.
  */
 export function useLenis() {
+  const { graphicsMode } = useGraphics();
   useEffect(() => {
     if (typeof window === "undefined") return;
+    if (graphicsMode !== "interactive-3d") return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     // Skip on mobile since touch events have native smooth inertia/momentum scroll
     if (window.matchMedia("(max-width: 767px)").matches) return;
@@ -412,7 +469,7 @@ export function useLenis() {
       delete (window as any).lenis;
       lenis.destroy();
     };
-  }, []);
+  }, [graphicsMode]);
 }
 
 export function useBgShifter() {
@@ -918,6 +975,7 @@ export function NoiseOverlay() {
 
 /* ============ HERO ============ */
 export function Hero() {
+  const { graphicsMode } = useGraphics();
   const splineHostRef = useRef<HTMLDivElement>(null);
   const splineSceneRef = useRef<{ emitEvent: (eventName: string, targetName?: string) => void; getApp: () => unknown } | null>(null);
   const [wave, setWave] = useState(false);
@@ -989,21 +1047,26 @@ export function Hero() {
       {/* Spline robot — full hero bleed so it tracks the cursor everywhere */}
       <div ref={splineHostRef} data-spline-host className="absolute inset-0 z-0">
         <div className="absolute inset-0 cursor-pointer" onClick={handleRobotClick} />
-        <HeavyGate
-          desktopOnly
-          rootMargin="600px"
-          className="absolute inset-0"
-          fallback={
-            /* Mobile hero fallback: soft radial glow — no WebGL, no crash */
-            <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse at 70% 50%, rgba(124,110,255,0.22) 0%, transparent 55%), radial-gradient(ellipse at 30% 70%, rgba(92,189,185,0.15) 0%, transparent 50%)" }} />
-          }
-        >
-          <SplineScene
-            ref={splineSceneRef}
-            scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
-            className="absolute inset-0 h-full w-full"
-          />
-        </HeavyGate>
+        {graphicsMode === "interactive-3d" ? (
+          <HeavyGate
+            desktopOnly
+            rootMargin="600px"
+            className="absolute inset-0"
+            fallback={
+              /* Mobile hero fallback: soft radial glow — no WebGL, no crash */
+              <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse at 70% 50%, rgba(124,110,255,0.22) 0%, transparent 55%), radial-gradient(ellipse at 30% 70%, rgba(92,189,185,0.15) 0%, transparent 50%)" }} />
+            }
+          >
+            <SplineScene
+              ref={splineSceneRef}
+              scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
+              className="absolute inset-0 h-full w-full"
+            />
+          </HeavyGate>
+        ) : (
+          /* Mobile hero fallback: soft radial glow — no WebGL, no crash */
+          <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse at 70% 50%, rgba(124,110,255,0.22) 0%, transparent 55%), radial-gradient(ellipse at 30% 70%, rgba(92,189,185,0.15) 0%, transparent 50%)" }} />
+        )}
         {/* Speech bubble */}
         <div
           className="pointer-events-none absolute right-[10vw] top-[22vh] z-20 transition-all duration-500"
@@ -1091,6 +1154,7 @@ export function Hero() {
 
 /* ============ LIVE 3D (Spline scene) ============ */
 export function Live3D() {
+  const { graphicsMode, setGraphicsMode } = useGraphics();
   return (
     <section id="live3d" className="relative px-5 py-16 sm:px-6 sm:py-24 md:px-12 md:py-32">
       <div className="mx-auto max-w-[1300px]">
@@ -1137,21 +1201,38 @@ export function Live3D() {
               </div>
 
               {/* Right — Spline scene */}
-              <div className="relative h-full w-full">
+              <div className="relative h-full w-full min-h-[300px]">
                 <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-r from-black/80 via-transparent to-transparent md:from-black/60" />
-                <HeavyGate
-                  desktopOnly
-                  rootMargin="200px"
-                  className="absolute inset-0"
-                  fallback={
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(92,189,185,0.15),transparent_70%)]" />
-                  }
-                >
-                  <SplineScene
-                    scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
-                    className="absolute inset-0 h-full w-full"
-                  />
-                </HeavyGate>
+                {graphicsMode === "interactive-3d" ? (
+                  <HeavyGate
+                    desktopOnly
+                    rootMargin="200px"
+                    className="absolute inset-0"
+                    fallback={
+                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(92,189,185,0.15),transparent_70%)]" />
+                    }
+                  >
+                    <SplineScene
+                      scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
+                      className="absolute inset-0 h-full w-full"
+                    />
+                  </HeavyGate>
+                ) : (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-[radial-gradient(circle_at_50%_50%,rgba(92,189,185,0.12),transparent_75%)] p-6 text-center">
+                    <div className="mb-4 h-12 w-12 rounded-full border border-white/10 bg-white/5 flex items-center justify-center text-xl">
+                      🎨
+                    </div>
+                    <p className="max-w-[280px] font-mono text-[10px] uppercase tracking-widest text-muted-soft mb-4">
+                      3D WebGL Scene is paused for smooth scrolling performance.
+                    </p>
+                    <button
+                      onClick={() => setGraphicsMode("interactive-3d")}
+                      className="rounded-full border border-violet bg-violet/10 px-4 py-2 font-mono text-[10px] uppercase tracking-widest text-white transition-all hover:bg-violet/30 active:scale-[0.96]"
+                    >
+                      Load Live 3D Scene
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </Card>
@@ -1849,6 +1930,7 @@ export function Journey() {
 
 /* ============ RECOGNITION ============ */
 export function Recognition() {
+  const { graphicsMode } = useGraphics();
   const items: Array<{ v: number; suffix?: string; prefix?: string; label: string; decimals?: number; compact?: boolean }> = [
     { v: 1_000_000, suffix: "+", label: "LinkedIn Impressions", decimals: 0, compact: true },
     { v: 0.095, prefix: "Top ", suffix: "%", label: "Global LinkedIn Rank · Cleve AI 2024", decimals: 3 },
@@ -1857,9 +1939,11 @@ export function Recognition() {
   ];
   return (
     <section id="recognition" className="relative overflow-hidden px-5 py-20 sm:px-6 sm:py-28 md:px-12 md:py-40">
-      <HeavyGate desktopOnly className="pointer-events-none absolute inset-0 opacity-60">
-        <GLSLHills speed={0.35} />
-      </HeavyGate>
+      {graphicsMode === "interactive-3d" && (
+        <HeavyGate desktopOnly className="pointer-events-none absolute inset-0 opacity-60">
+          <GLSLHills speed={0.35} />
+        </HeavyGate>
+      )}
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60" />
       <div className="relative mx-auto max-w-[1300px]">
         <Reveal><SectionLabel num="05" text="Monuments" /></Reveal>
@@ -2457,21 +2541,43 @@ export function Contact() {
 
 /* ============ ROOT ============ */
 export function PortfolioShell({ children }: { children: ReactNode }) {
+  const [graphicsMode, setGraphicsModeState] = useState<"standard" | "interactive-3d">("standard");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("portfolio-graphics-mode");
+      if (saved === "interactive-3d") {
+        setGraphicsModeState("interactive-3d");
+      }
+    }
+  }, []);
+
+  const setGraphicsMode = (mode: "standard" | "interactive-3d") => {
+    setGraphicsModeState(mode);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("portfolio-graphics-mode", mode);
+    }
+  };
+
   useLenis();
   useBgShifter();
+
   return (
-    <main className="relative min-h-screen bg-[#07121F] text-body">
-      {/* Primary global shader backdrop — shown on plain areas, dominated by any section background that sits on top */}
-      <PaperShaderBackdrop />
-      {/* Existing CSS mesh kept as additional soft layer */}
-      <CSSMeshBg />
-      <div className="relative z-10">
-        <NoiseOverlay />
-        <ScrollProgress />
-        <DotsNav />
-        {children}
-      </div>
-    </main>
+    <GraphicsContext.Provider value={{ graphicsMode, setGraphicsMode }}>
+      <main className="relative min-h-screen bg-[#07121F] text-body">
+        {/* Primary global shader backdrop — shown on plain areas, dominated by any section background that sits on top */}
+        <PaperShaderBackdrop />
+        {/* Existing CSS mesh kept as additional soft layer */}
+        <CSSMeshBg />
+        <div className="relative z-10">
+          <NoiseOverlay />
+          <ScrollProgress />
+          <DotsNav />
+          {children}
+        </div>
+        <GraphicsToggle />
+      </main>
+    </GraphicsContext.Provider>
   );
 }
 

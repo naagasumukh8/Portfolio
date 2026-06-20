@@ -20,7 +20,7 @@ export function PaperShaderBackdrop() {
     >
       {/* Compositor-driven smooth CSS animated auroras */}
       <div 
-        className="absolute -inset-[30%] opacity-40 blur-[100px]"
+        className="absolute -inset-[30%] opacity-40"
         style={{
           background: `radial-gradient(45% 45% at 20% 30%, rgba(124,110,255,0.30) 0%, transparent 100%),
                        radial-gradient(40% 50% at 85% 20%, rgba(92,189,185,0.22) 0%, transparent 100%),
