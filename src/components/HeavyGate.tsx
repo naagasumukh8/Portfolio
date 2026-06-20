@@ -38,6 +38,39 @@ export function useIsDesktop() {
   return d;
 }
 
+/**
+ * Detects low-end devices that would struggle with WebGL/canvas.
+ * Checks: small screen, low CPU count, low RAM, or slow connection.
+ * Also sets `data-low-end="true"` on <html> so CSS can hook in.
+ */
+export function useLowEndDevice() {
+  const [lowEnd, setLowEnd] = useState(false);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const nav = navigator as Navigator & {
+      deviceMemory?: number;
+      connection?: { effectiveType?: string; saveData?: boolean };
+    };
+    const isSmallScreen = window.matchMedia("(max-width: 767px)").matches;
+    const lowCPU = typeof navigator.hardwareConcurrency === "number" && navigator.hardwareConcurrency <= 4;
+    const lowRAM = typeof nav.deviceMemory === "number" && nav.deviceMemory <= 2;
+    const slowNet = nav.connection?.saveData === true ||
+      nav.connection?.effectiveType === "2g" ||
+      nav.connection?.effectiveType === "slow-2g";
+
+    const result = isSmallScreen || lowCPU || lowRAM || slowNet;
+    setLowEnd(result);
+
+    // Propagate to DOM so CSS can use [data-low-end] selector
+    if (result) {
+      document.documentElement.dataset.lowEnd = "true";
+    } else {
+      delete document.documentElement.dataset.lowEnd;
+    }
+  }, []);
+  return lowEnd;
+}
+
 /** Defers a true-flag until the browser is idle (or after a max delay). */
 export function useIdle(delay = 1200) {
   const [ready, setReady] = useState(false);
@@ -57,7 +90,7 @@ export function useIdle(delay = 1200) {
 interface HeavyGateProps {
   children: ReactNode;
   fallback?: ReactNode;
-  /** Skip mounting heavy children on mobile (renders fallback instead). */
+  /** Skip mounting heavy children on mobile/low-end devices (renders fallback instead). */
   desktopOnly?: boolean;
   /** Distance before viewport to start mounting. */
   rootMargin?: string;
@@ -69,7 +102,7 @@ interface HeavyGateProps {
 /**
  * Mounts heavy children only when:
  *  - the wrapper is near/in view (IntersectionObserver), and
- *  - the device qualifies (desktopOnly gate when requested).
+ *  - the device qualifies (desktopOnly gate when requested — also blocks low-end phones).
  * Wraps children in Suspense so React.lazy works seamlessly.
  */
 export function HeavyGate({
@@ -82,7 +115,9 @@ export function HeavyGate({
 }: HeavyGateProps) {
   const [ref, inView] = useInView<HTMLDivElement>(rootMargin);
   const desktop = useIsDesktop();
-  const allow = !desktopOnly || desktop;
+  const lowEnd = useLowEndDevice();
+  // desktopOnly: block on mobile OR low-end devices (old phones crash even on "tablet-sized" screens)
+  const allow = !desktopOnly || (desktop && !lowEnd);
   return (
     <Tag ref={ref as any} className={className}>
       {allow && inView ? <Suspense fallback={fallback}>{children}</Suspense> : fallback}

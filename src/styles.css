@@ -72,9 +72,13 @@
     border-color: var(--color-border);
   }
   html {
-    scroll-behavior: smooth !important;
+    /* IMPORTANT: do NOT set scroll-behavior:smooth here — Lenis owns scrolling.
+       Native smooth + Lenis = double interpolation = jank. */
+    scroll-behavior: auto;
     background: #000000;
     overflow-x: hidden;
+    /* Prevent overscroll rubber-band on Windows/Chrome that causes visible pop */
+    overscroll-behavior: none;
   }
   body {
     background-color: #000000;
@@ -82,7 +86,10 @@
     font-family: var(--font-sans);
     cursor: auto;
     overflow-x: hidden;
+    overscroll-behavior: none;
     -webkit-font-smoothing: antialiased;
+    /* Hint browser to keep body on its own GPU layer */
+    transform: translateZ(0);
   }
   /* Custom cursor disabled — was causing flicker/lag on some setups. Default cursor is clean and reliable. */
   h1, h2, h3, h4 {
@@ -95,14 +102,23 @@
     color: #000000;
   }
   ::-webkit-scrollbar {
-    width: 8px;
+    width: 4px;
   }
   ::-webkit-scrollbar-track {
-    background: #000000;
+    background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background: #ffffff;
-    border-radius: 0;
+    background: rgba(255,255,255,0.15);
+    border-radius: 9999px;
+    transition: background 0.2s ease;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255,255,255,0.35);
+  }
+  /* iOS spring for ALL interactive elements — feels tactile and native */
+  a, button, [role="button"], summary, label[for], [data-hover] {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
   }
 }
 
@@ -197,7 +213,23 @@
 
   .tilt-card {
     transform-style: preserve-3d;
-    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    /* Spring physics: settles with micro-bounce so the 3D tilt feels physical */
+    transition: transform 0.6s cubic-bezier(0.34, 1.28, 0.64, 1);
+    will-change: transform;
+    backface-visibility: hidden;
+  }
+
+  /* GPU promotion utility — use on elements that animate frequently */
+  .gpu {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+  }
+
+  /* Smooth reveal base — pre-promotes element to its own layer before animation */
+  .will-reveal {
+    will-change: transform, opacity;
+    transform: translateZ(0);
   }
 }
 
@@ -251,18 +283,27 @@
     0 6px 20px -8px rgba(0,0,0,0.55),
     inset 0 1px 0 rgba(255,255,255,0.28),
     inset 0 -1px 0 rgba(0,0,0,0.35);
-  transition: transform 0.35s cubic-bezier(0.16,1,0.3,1), box-shadow 0.35s, border-color 0.35s;
+  /* iOS spring — feels alive on press/release */
+  transition:
+    transform 0.5s cubic-bezier(0.34,1.56,0.64,1),
+    box-shadow 0.4s cubic-bezier(0.16,1,0.3,1),
+    border-color 0.3s ease,
+    background 0.3s ease;
   cursor: pointer;
+  will-change: transform;
 }
 @utility glass-pill {
   &:hover {
-    transform: translateY(-2px);
-    border-color: rgba(255,255,255,0.3);
+    transform: translateY(-3px) scale(1.02);
+    border-color: rgba(255,255,255,0.32);
     box-shadow:
-      0 14px 40px -10px rgba(124,110,255,0.45),
-      inset 0 1px 0 rgba(255,255,255,0.35);
+      0 18px 48px -10px rgba(124,110,255,0.5),
+      inset 0 1px 0 rgba(255,255,255,0.38);
   }
-  &:active { transform: translateY(0) scale(0.98); }
+  &:active {
+    transform: translateY(1px) scale(0.97);
+    transition: transform 0.08s ease-out, box-shadow 0.08s ease-out;
+  }
 }
 
 @utility glass-row {
@@ -271,30 +312,47 @@
   -webkit-backdrop-filter: blur(5px) saturate(125%);
   border: 1px solid rgba(255,255,255,0.08);
   border-radius: 1.25rem;
-  transition: transform 0.35s cubic-bezier(0.16,1,0.3,1), border-color 0.35s, box-shadow 0.35s, background 0.35s;
+  /* Spring easing — lifts smoothly, settles with a micro-bounce */
+  transition:
+    transform 0.55s cubic-bezier(0.34,1.45,0.64,1),
+    border-color 0.35s ease,
+    box-shadow 0.45s cubic-bezier(0.16,1,0.3,1),
+    background 0.35s ease;
+  will-change: transform;
 }
 @utility glass-row {
   &:hover {
-    transform: translateY(-2px);
-    border-color: rgba(124,110,255,0.35);
-    background: linear-gradient(180deg, rgba(124,110,255,0.08) 0%, rgba(255,255,255,0.02) 100%);
-    box-shadow: 0 20px 60px -20px rgba(124,110,255,0.45);
+    transform: translateY(-3px) scale(1.005);
+    border-color: rgba(255,255,255,0.18);
+    background: linear-gradient(180deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.02) 100%);
+    box-shadow: 0 24px 64px -20px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.12);
+  }
+  &:active {
+    transform: translateY(0) scale(0.99);
+    transition: transform 0.1s ease-out;
   }
 }
 
 /* ============ Batch 1 polish: tap spring + ticker fade masks ============ */
 
-/* Mobile-only tap feedback — native iOS spring. Desktop unaffected.
-   Targets common interactive elements; designers can add .tap-spring manually. */
+/* iOS spring tap feedback — applied on ALL devices (not just touch).
+   Gives every button a satisfying press-then-spring-back feel.
+   The spring overshoot (1.56) mimics Apple's UIKit spring physics. */
+a, button, [role="button"], .tap-spring, [data-hover], [data-tap] {
+  transition:
+    transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+    opacity 0.2s ease;
+}
+a:active, button:active, [role="button"]:active,
+.tap-spring:active, [data-hover]:active, [data-tap]:active {
+  transform: scale(0.95);
+  transition: transform 0.08s ease-out, opacity 0.08s ease-out;
+}
+/* Stronger spring on coarse-pointer (mobile) — bigger press = more satisfying */
 @media (hover: none) and (pointer: coarse) {
-  a, button, [role="button"], .tap-spring,
-  [data-hover], [data-tap] {
-    transition: transform 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
   a:active, button:active, [role="button"]:active,
   .tap-spring:active, [data-hover]:active, [data-tap]:active {
-    transform: scale(0.94);
-    transition: transform 80ms ease-out;
+    transform: scale(0.92);
   }
 }
 
@@ -304,26 +362,29 @@
           mask-image: linear-gradient(90deg, transparent 0, #000 60px, #000 calc(100% - 60px), transparent 100%);
 }
 
-/* Contact rows — hover expand + violet wash (desktop). Mobile keeps tap-spring. */
+/* Contact rows — hover expand + soft wash (desktop). Spring easing. */
 @media (hover: hover) {
   .glass-row.contact-row {
     padding-top: 1.5rem; padding-bottom: 1.5rem;
-    transition: padding 280ms cubic-bezier(0.4,0,0.2,1),
-                background 280ms cubic-bezier(0.4,0,0.2,1),
-                transform 0.35s cubic-bezier(0.16,1,0.3,1),
-                border-color 0.35s, box-shadow 0.35s;
+    transition:
+      padding 380ms cubic-bezier(0.34,1.2,0.64,1),
+      background 280ms ease,
+      transform 0.55s cubic-bezier(0.34,1.45,0.64,1),
+      border-color 0.35s ease,
+      box-shadow 0.45s cubic-bezier(0.16,1,0.3,1);
   }
   .glass-row.contact-row:hover {
-    padding-top: 1.95rem; padding-bottom: 1.95rem;
-    background: linear-gradient(180deg, rgba(124,110,255,0.10) 0%, rgba(124,110,255,0.04) 100%) !important;
+    padding-top: 2rem; padding-bottom: 2rem;
+    background: linear-gradient(180deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.02) 100%) !important;
   }
 }
 
-/* ============ MOBILE PERFORMANCE: disable 3 heaviest effects on phones ============
+/* ============ MOBILE PERFORMANCE: disable heaviest effects on phones ============
  * Desktop/laptop stays untouched. On phones (<768px) we kill:
  *   1) The full-screen animated noise overlay (constant GPU repaints)
  *   2) The counter-rotating gold ring on the About avatar (two conic spins forever)
- *   3) Heavy backdrop-blur on glass surfaces (22px blur+saturate murders mobile GPU)
+ *   3) Heavy backdrop-filter on glass surfaces (22px blur+saturate murders mobile GPU)
+ *   4) ALL continuously-running aurora/mesh/particle CSS animations (new — biggest crash cause)
  */
 @media (max-width: 767px) {
   /* 1) Noise overlay off */
@@ -340,6 +401,42 @@
     -webkit-backdrop-filter: none !important;
     background: linear-gradient(180deg, rgba(20,20,30,0.78) 0%, rgba(20,20,30,0.62) 100%) !important;
   }
+
+  /* 4) Pause ALL background CSS animations — these are the #1 crash cause on old phones.
+     auroraDrift (section backdrops), splashMesh (global CSS bg), dotsDrift, gridPan,
+     splashFloat (WavingBalls), splashSpin (OrbitingDots), badgeShimmer, monAngleSpin.
+     Content stays visible — animations simply freeze in place (looks fine). */
+  @keyframes auroraDrift { 0%, 100% { transform: none; } }
+  @keyframes splashMesh  { 0%, 100% { transform: none; } }
+  @keyframes dotsDrift   { 0%, 100% { transform: none; } }
+  @keyframes gridPan     { 0%, 100% { transform: none; } }
+  @keyframes splashFloat { 0%, 100% { transform: none; } }
+  @keyframes splashSpin  { 0%, 100% { transform: none; } }
+  @keyframes badgeShimmer { 0%, 100% { transform: translateX(-120%); } }
+  @keyframes monAngleSpin { 0%, 100% {} }
+
+  /* Reduce marquee/ticker speed on mobile — fewer repaints */
+  .animate-ticker        { animation-duration: 90s !important; }
+  .animate-ticker-reverse { animation-duration: 90s !important; }
+
+  /* Eliminate will-change on mobile — it actually costs memory on low-RAM devices */
+  * { will-change: auto !important; }
 }
 
-
+/* ============ LOW-END DEVICE HOOKS ============
+ * useLowEndDevice() sets data-low-end="true" on <html>.
+ * These rules add extra protection for old/weak devices beyond the mobile breakpoint.
+ */
+[data-low-end="true"] {
+  /* Kill all transitions and animations on truly weak devices */
+}
+[data-low-end="true"] * {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  will-change: auto !important;
+}
+/* Keep essential UI transitions (opacity for modals, etc.) */
+[data-low-end="true"] .page-transition {
+  transition: opacity 0.2s ease !important;
+}

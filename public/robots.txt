@@ -1,4 +1,8 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://naagasumukh.lovable.app/sitemap.xml
+# Sitemap
+Sitemap: https://naagasumukh.engineer/sitemap.xml
+
+# Block crawling of source maps (optional optimisation)
+Disallow: /*.map$

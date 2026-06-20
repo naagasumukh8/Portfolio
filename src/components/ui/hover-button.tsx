@@ -84,14 +84,17 @@ const HoverButton = React.forwardRef<HTMLButtonElement, HoverButtonProps>(
         onPointerLeave={() => setIsListening(false)}
         onPointerMove={handlePointerMove}
         className={cn(
-          // Apple liquid-glass shell
+          // Apple liquid-glass shell with iOS spring physics
           "group relative isolate overflow-hidden rounded-full",
           "border border-white/15 bg-white/[0.06] px-7 py-3 text-sm font-medium text-white",
           "backdrop-blur-xl backdrop-saturate-150",
           "shadow-[0_6px_24px_-8px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.25),inset_0_-1px_0_rgba(0,0,0,0.4)]",
-          "transition-all duration-300 hover:-translate-y-0.5 hover:border-white/25",
-          "hover:shadow-[0_12px_40px_-10px_rgba(124,110,255,0.55),inset_0_1px_0_rgba(255,255,255,0.3)]",
-          "active:translate-y-0 active:scale-[0.98]",
+          // Spring easing: hover lifts with gentle overshoot settle, active snaps fast
+          "[transition:transform_0.5s_cubic-bezier(0.34,1.56,0.64,1),box-shadow_0.4s_cubic-bezier(0.16,1,0.3,1),border-color_0.3s_ease]",
+          "hover:-translate-y-1 hover:scale-[1.02] hover:border-white/28",
+          "hover:shadow-[0_18px_48px_-10px_rgba(124,110,255,0.6),inset_0_1px_0_rgba(255,255,255,0.35)]",
+          "active:translate-y-px active:scale-[0.97] active:[transition:transform_0.08s_ease-out,box-shadow_0.08s_ease-out]",
+          "will-change-transform",
           className,
         )}
         {...props}

@@ -11,7 +11,7 @@ import DisplayCards from "@/components/ui/display-cards";
 import { ContainerScroll } from "@/components/ui/container-scroll-animation";
 import { SparklesCore } from "@/components/ui/sparkles";
 import { Card } from "@/components/ui/card";
-import { HeavyGate } from "@/components/HeavyGate";
+import { HeavyGate, useIsDesktop, useLowEndDevice } from "@/components/HeavyGate";
 import { Award, BrainCircuit, BarChart3, Code2, Database, Brain, Sparkles, Workflow, BarChart, Boxes, Atom, Linkedin, Github, Trophy, Star, GitFork, Users, MessageSquare, Eye, GitBranch, Zap, Briefcase, GraduationCap } from "lucide-react";
 import RadialOrbitalTimeline from "@/components/ui/radial-orbital-timeline";
 import { HoverButton } from "@/components/ui/hover-button";
@@ -355,8 +355,14 @@ export function useLenis() {
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    let lenis: { destroy: () => void; raf: (t: number) => void; on: (e: string, cb: () => void) => void } | null = null;
+    let lenis: {
+      destroy: () => void;
+      raf: (t: number) => void;
+      on: (e: string, cb: () => void) => void;
+      scrollTo: (target: string | number | HTMLElement, opts?: Record<string, unknown>) => void;
+    } | null = null;
     let cancelled = false;
+
     (async () => {
       const [{ default: Lenis }, gsapMod, stMod] = await Promise.all([
         import("lenis"),
@@ -367,21 +373,62 @@ export function useLenis() {
       const gsap = gsapMod.default;
       const ScrollTrigger = stMod.ScrollTrigger;
       gsap.registerPlugin(ScrollTrigger);
+
       const instance = new Lenis({
-        lerp: 0.075,
-        duration: 1.4,
+        // lerp 0.1 = silky water-like momentum (lower = more lag, higher = snappier)
+        lerp: 0.1,
+        // Keep duration undefined so lerp governs — avoids double easing
         smoothWheel: true,
-        wheelMultiplier: 1,
-        touchMultiplier: 1,
+        // Slightly under 1 so the wheel doesn't overshoot on fast flicks
+        wheelMultiplier: 0.9,
+        // 1.8 gives a responsive native-iOS feel on touch screens
+        touchMultiplier: 1.8,
+        // Sync Lenis with touch inertia (iOS Safari momentum)
+        syncTouch: true,
+        infinite: false,
       });
+
       lenis = instance as unknown as typeof lenis;
+
+      // Keep GSAP ScrollTrigger synced with Lenis position
       instance.on("scroll", ScrollTrigger.update);
       gsap.ticker.add((time) => instance.raf(time * 1000));
       gsap.ticker.lagSmoothing(0);
+
+      // Intercept anchor clicks so Lenis handles the scroll (no native jump)
+      const handleAnchorClick = (e: Event) => {
+        const anchor = (e.target as HTMLElement)?.closest("a[href^='#']");
+        if (!anchor) return;
+        const href = anchor.getAttribute("href");
+        if (!href) return;
+        const target = document.querySelector(href);
+        if (!target) return;
+        e.preventDefault();
+        instance.scrollTo(target as HTMLElement, {
+          offset: -80, // account for fixed top-bar height
+          duration: 1.4,
+          easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // exponential ease-out
+        });
+      };
+
+      document.addEventListener("click", handleAnchorClick);
+
+      // Cleanup
+      const origDestroy = instance.destroy.bind(instance);
+      (lenis as typeof lenis & { _anchClean: () => void })._anchClean = () =>
+        document.removeEventListener("click", handleAnchorClick);
+
+      // Store cleanup on lenis proxy
+      void origDestroy; // keep reference
     })();
+
     return () => {
       cancelled = true;
-      if (lenis) lenis.destroy();
+      if (lenis) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (lenis as any)._anchClean?.();
+        lenis.destroy();
+      }
     };
   }, []);
 }
@@ -418,10 +465,17 @@ export function useBgShifter() {
 
 /* ============ NEURAL NETWORK CANVAS ============ */
 function NeuralCanvas() {
+  const isDesktop = useIsDesktop();
+  const isLowEnd = useLowEndDevice();
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
   useEffect(() => {
-    const canvas = canvasRef.current!;
-    const ctx = canvas.getContext("2d")!;
+    // Skip canvas entirely on mobile/low-end — prevents GPU crash on old phones
+    if (!isDesktop || isLowEnd) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
     let w = 0, h = 0, dpr = Math.min(window.devicePixelRatio || 1, 2);
     const mouse = { x: -9999, y: -9999 };
     type P = { x: number; y: number; vx: number; vy: number };
@@ -431,7 +485,8 @@ function NeuralCanvas() {
       w = canvas.clientWidth; h = canvas.clientHeight;
       canvas.width = w * dpr; canvas.height = h * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      const count = Math.min(110, Math.floor((w * h) / 14000));
+      // Reduce particle count — max 60 even on desktop to stay under budget
+      const count = Math.min(60, Math.floor((w * h) / 18000));
       particles = Array.from({ length: count }, () => ({
         x: Math.random() * w,
         y: Math.random() * h,
@@ -466,7 +521,6 @@ function NeuralCanvas() {
         if (p.x < 0) p.x = w; if (p.x > w) p.x = 0;
         if (p.y < 0) p.y = h; if (p.y > h) p.y = 0;
       }
-      // lines
       for (let i = 0; i < particles.length; i++) {
         for (let j = i + 1; j < particles.length; j++) {
           const a = particles[i], b = particles[j];
@@ -482,7 +536,6 @@ function NeuralCanvas() {
           }
         }
       }
-      // dots
       for (const p of particles) {
         const dm = Math.hypot(mouse.x - p.x, mouse.y - p.y);
         const close = dm < 180;
@@ -513,7 +566,18 @@ function NeuralCanvas() {
       observer.disconnect();
       cancelAnimationFrame(raf);
     };
-  }, []);
+  }, [isDesktop, isLowEnd]);
+
+  // Mobile: lightweight CSS gradient substitute (zero GPU cost)
+  if (!isDesktop || isLowEnd) {
+    return (
+      <div className="absolute inset-0 opacity-40"
+        style={{
+          background: "radial-gradient(ellipse at 30% 40%, rgba(124,110,255,0.25) 0%, transparent 55%), radial-gradient(ellipse at 75% 65%, rgba(92,189,185,0.18) 0%, transparent 50%)",
+        }}
+      />
+    );
+  }
   return <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />;
 }
 
@@ -525,7 +589,7 @@ function Reveal({ children, delay = 0, className = "" }: { children: ReactNode; 
     const el = ref.current; if (!el) return;
     const io = new IntersectionObserver(([e]) => {
       if (e.isIntersecting) { setVis(true); io.disconnect(); }
-    }, { threshold: 0.15 });
+    }, { threshold: 0.1, rootMargin: "0px 0px -40px 0px" });
     io.observe(el);
     return () => io.disconnect();
   }, []);
@@ -535,8 +599,9 @@ function Reveal({ children, delay = 0, className = "" }: { children: ReactNode; 
       className={className}
       style={{
         opacity: vis ? 1 : 0,
-        transform: vis ? "translateY(0)" : "translateY(40px)",
-        transition: `opacity 0.9s cubic-bezier(0.16,1,0.3,1) ${delay}ms, transform 0.9s cubic-bezier(0.16,1,0.3,1) ${delay}ms`,
+        transform: vis ? "translateY(0)" : "translateY(32px)",
+        /* Spring easing: fast rise, gentle overshoot settle — feels alive not mechanical */
+        transition: `opacity 0.75s cubic-bezier(0.16,1,0.3,1) ${delay}ms, transform 0.85s cubic-bezier(0.34,1.2,0.64,1) ${delay}ms`,
         willChange: "transform, opacity",
       }}
     >
@@ -953,7 +1018,8 @@ export function Hero() {
           rootMargin="600px"
           className="absolute inset-0"
           fallback={
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_50%,rgba(124,110,255,0.18),transparent_60%)]" />
+            /* Mobile hero fallback: soft radial glow — no WebGL, no crash */
+            <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse at 70% 50%, rgba(124,110,255,0.22) 0%, transparent 55%), radial-gradient(ellipse at 30% 70%, rgba(92,189,185,0.15) 0%, transparent 50%)" }} />
           }
         >
           <SplineScene
@@ -1355,45 +1421,73 @@ export function About() {
           </div>
         </div>
 
-        {/* FOCUS AREAS — Scroll Animation */}
+        {/* FOCUS AREAS — Scroll Animation (desktop only — scroll-driven 3D transform kills old phones) */}
         <div className="mt-16 sm:mt-24 md:mt-32">
-          <ContainerScroll
-            titleComponent={
-              <h2 className="font-display text-2xl font-bold text-body sm:text-3xl md:text-4xl mb-8">
-                Core Expertise
-              </h2>
-            }
-          >
-            <div className="h-full w-full rounded-xl overflow-hidden relative">
-              <img
-                src="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=1200&auto=format&fit=crop&q=80"
-                alt="AI and machine learning abstract visualization"
-                className="absolute inset-0 h-full w-full object-cover"
-                loading="lazy"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 p-4 md:p-8">
-                <div className="grid grid-cols-2 gap-3 md:gap-4">
-                  {focus.map((f) => (
-                    <div
-                      key={f.title}
-                      className="rounded-xl bg-white/[0.06] border border-white/[0.1] backdrop-blur-md p-3 md:p-4"
-                    >
-                      <div className="mb-2 inline-flex h-8 w-8 items-center justify-center rounded-lg bg-violet/20 text-violet ring-1 ring-violet/30">
-                        <f.icon size={16} />
+          <HeavyGate
+            desktopOnly
+            rootMargin="200px"
+            className="w-full"
+            fallback={
+              /* Mobile fallback: plain 2-col grid, same content without scroll-driven perspective */
+              <div className="rounded-2xl border border-white/10 bg-white/[0.03] overflow-hidden">
+                <div className="p-6">
+                  <h2 className="font-display text-xl font-bold text-body mb-5">Core Expertise</h2>
+                  <div className="grid grid-cols-2 gap-3">
+                    {focus.map((f) => (
+                      <div
+                        key={f.title}
+                        className="rounded-xl bg-white/[0.06] border border-white/[0.1] p-3"
+                      >
+                        <div className="mb-2 inline-flex h-7 w-7 items-center justify-center rounded-lg bg-white/10">
+                          <f.icon size={14} className="text-body" />
+                        </div>
+                        <div className="mb-1 font-display text-sm font-semibold text-white">{f.title}</div>
+                        <div className="text-[11px] leading-relaxed text-white/60">{f.text}</div>
                       </div>
-                      <div className="mb-1 font-display text-sm md:text-base font-semibold text-white">
-                        {f.title}
-                      </div>
-                      <div className="text-xs md:text-sm leading-relaxed text-white/70">
-                        {f.text}
-                      </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               </div>
-            </div>
-          </ContainerScroll>
+            }
+          >
+            <ContainerScroll
+              titleComponent={
+                <h2 className="font-display text-2xl font-bold text-body sm:text-3xl md:text-4xl mb-8">
+                  Core Expertise
+                </h2>
+              }
+            >
+              <div className="h-full w-full rounded-xl overflow-hidden relative">
+                <img
+                  src="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=1200&auto=format&fit=crop&q=80"
+                  alt="AI and machine learning abstract visualization"
+                  className="absolute inset-0 h-full w-full object-cover"
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-4 md:p-8">
+                  <div className="grid grid-cols-2 gap-3 md:gap-4">
+                    {focus.map((f) => (
+                      <div
+                        key={f.title}
+                        className="rounded-xl bg-white/[0.06] border border-white/[0.1] backdrop-blur-md p-3 md:p-4"
+                      >
+                        <div className="mb-2 inline-flex h-8 w-8 items-center justify-center rounded-lg bg-violet/20 text-violet ring-1 ring-violet/30">
+                          <f.icon size={16} />
+                        </div>
+                        <div className="mb-1 font-display text-sm md:text-base font-semibold text-white">
+                          {f.title}
+                        </div>
+                        <div className="text-xs md:text-sm leading-relaxed text-white/70">
+                          {f.text}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </ContainerScroll>
+          </HeavyGate>
         </div>
 
       </div>
@@ -1471,9 +1565,32 @@ export function Skills() {
                   "radial-gradient(40% 40% at 25% 30%, rgba(124,110,255,0.28), transparent 70%), radial-gradient(35% 35% at 80% 75%, rgba(244,196,107,0.18), transparent 70%), radial-gradient(45% 45% at 60% 50%, rgba(64,200,255,0.14), transparent 70%)",
               }}
             />
-            <div className="relative h-[460px] w-full sm:h-[600px] md:h-[700px] [&>div]:scale-[0.62] sm:[&>div]:scale-[0.82] md:[&>div]:scale-100 [&>div]:origin-center">
-              <RadialOrbitalTimeline timelineData={skillsTimeline} />
-            </div>
+            {/* Desktop: full orbital — Mobile: lightweight chip grid (no animation crash) */}
+            <HeavyGate
+              desktopOnly
+              rootMargin="200px"
+              className="relative h-[460px] w-full sm:h-[600px] md:h-[700px] [&>div]:scale-[0.62] sm:[&>div]:scale-[0.82] md:[&>div]:scale-100 [&>div]:origin-center"
+              fallback={
+                <div className="relative flex h-auto w-full flex-col items-center justify-center gap-3 py-12 px-6">
+                  <div className="mb-4 font-mono text-[10px] uppercase tracking-widest text-muted-soft">Skills · Interactive on desktop</div>
+                  <div className="flex flex-wrap justify-center gap-2">
+                    {skillsTimeline.map((s) => (
+                      <span
+                        key={s.id}
+                        className="flex items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.05] px-3 py-1.5 font-mono text-xs uppercase tracking-wider text-body"
+                      >
+                        <s.icon size={12} className="text-violet opacity-70" />
+                        {s.title}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              }
+            >
+              <div>
+                <RadialOrbitalTimeline timelineData={skillsTimeline} />
+              </div>
+            </HeavyGate>
           </div>
         </Reveal>
       </div>
@@ -1804,17 +1921,33 @@ export function Certs() {
       className="relative overflow-hidden px-5 py-24 sm:px-6 sm:py-32 md:px-12 md:py-36"
       style={{ background: "#080808" }}
     >
-      {/* Sparkles backdrop */}
+      {/* Sparkles backdrop — desktop only; old phones crash rendering a canvas particle system */}
       <div className="pointer-events-none absolute inset-0 z-0">
-        <SparklesCore
-          background="transparent"
-          minSize={0.4}
-          maxSize={1.2}
-          particleDensity={60}
-          particleColor="#ffffff"
-          speed={1}
-          className="h-full w-full"
-        />
+        <HeavyGate
+          desktopOnly
+          rootMargin="100px"
+          className="absolute inset-0"
+          fallback={
+            /* Mobile fallback: pure CSS star-scatter — zero GPU cost */
+            <div
+              className="absolute inset-0 opacity-60"
+              style={{
+                backgroundImage: "radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.5) 0%, transparent 100%), radial-gradient(1px 1px at 40% 60%, rgba(255,255,255,0.4) 0%, transparent 100%), radial-gradient(1px 1px at 70% 30%, rgba(255,255,255,0.5) 0%, transparent 100%), radial-gradient(1px 1px at 85% 75%, rgba(255,255,255,0.3) 0%, transparent 100%), radial-gradient(1px 1px at 25% 85%, rgba(255,255,255,0.4) 0%, transparent 100%), radial-gradient(1px 1px at 60% 15%, rgba(255,255,255,0.35) 0%, transparent 100%)",
+                backgroundSize: "100% 100%",
+              }}
+            />
+          }
+        >
+          <SparklesCore
+            background="transparent"
+            minSize={0.4}
+            maxSize={1.2}
+            particleDensity={60}
+            particleColor="#ffffff"
+            speed={1}
+            className="h-full w-full"
+          />
+        </HeavyGate>
         <div
           className="absolute inset-0"
           style={{
@@ -2095,7 +2228,8 @@ export function Vibe() {
       className="relative h-[80vh] w-full overflow-hidden border-y border-white/[0.04]"
     >
       <div className="absolute inset-0 bg-gradient-to-br from-[#1a1f3a] via-[#0F2540] to-black" />
-      <WavingBalls count={16} />
+      {/* 5 balls on mobile (was 16) — prevents paint/composite overload on old phones */}
+      <WavingBalls count={typeof window !== "undefined" && window.matchMedia("(max-width: 767px)").matches ? 5 : 16} />
       <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/30 to-black/70" />
 
       {/* mouse-driven image trail — desktop/tablet only (skipped on touch devices) */}
@@ -2212,7 +2346,7 @@ export function Contact() {
 
 /* ============ ROOT ============ */
 export function PortfolioShell({ children }: { children: ReactNode }) {
-  // useLenis();
+  useLenis(); // ← Lenis smooth scroll restored — was accidentally commented out
   useBgShifter();
   return (
     <main className="relative min-h-screen bg-[#07121F] text-body">
